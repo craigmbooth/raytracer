@@ -1,3 +1,4 @@
+import copy
 import numbers
 
 import raytracer.exceptions
@@ -30,7 +31,7 @@ class Matrix:
         return outstr
 
     @staticmethod
-    def _close(x, y, epsilon=1e-6):
+    def _close(x, y, epsilon=1e-3):
         """Utility function, returns True if two numbers are close, else false
         """
         return True if abs(x-y) < epsilon else False
@@ -71,7 +72,7 @@ class Matrix:
 
             for i in range(self.rows):
                 my_row = self.get_row(i)
-                result = sum([my_row[j]*other.values[j] for j in range(self.columns)])
+                result = sum([my_row[j]*other.values()[j] for j in range(self.columns)])
                 setattr(r, other.fillables[i], result)
             return r
 
@@ -101,6 +102,67 @@ class Matrix:
             m.set_col(i, self.get_row(i))
         return m
 
+    def submatrix(self, row, column):
+        """Return a copy of the matrix with the rows and column specified in the
+        arguments removed
+        """
+
+        m = copy.deepcopy(self)
+        _ = m.values.pop(row)
+        for row in m.values:
+            row.pop(column)
+
+        m.columns -= 1
+        m.rows -= 1
+        return m
+
+    def det(self):
+        """Calculates the determinant of the matrix"""
+
+        if self.columns == 2 and self.rows == 2:
+            return self.get(0, 0) * self.get(1, 1) - self.get(1, 0) * self.get(0, 1)
+        else:
+            det = 0
+            for i, value in enumerate(self.get_row(0)):
+                det += self.get(0, i) * self.cofactor(0, i)
+            return det
+
+
+    def minor(self, row, column):
+        """Calculate the minor of the matrix at row and column, which is
+        calculated as the determinant of the submatrix
+        """
+        return self.submatrix(row, column).det()
+
+    def cofactor(self, row, column):
+        """Calculate the cofactor of the matrix at row and column.  The cofactor
+        is the minor, potentially with its sign changed, depending upon its
+        location in the matrix
+        """
+
+        pre = 1 if (row + column) % 2 == 0 else -1
+        return pre * self.minor(row, column)
+
+    def inverse(self):
+        """Calculate the inverse of a matrix, or raise CannotInvertMatrix if
+        there is no inverse
+        """
+
+        determinant = self.det()
+        if determinant == 0:
+            raise raytracer.exceptions.CannotInvertMatrixError
+
+
+        m = Matrix(self.rows, self.columns)
+
+        for row in range(self.rows):
+            for col in range(self.columns):
+                c = self.cofactor(row, col)
+
+                # Note we have swapped row and col here, which takes care of a
+                # transpose under the hood
+                m.set(col, row, c / determinant)
+        return m
 
 class IdentityMatrix(Matrix):
 

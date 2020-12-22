@@ -1,6 +1,6 @@
 import unittest
 
-import raytracer.matrices, raytracer.tuples
+import raytracer.exceptions, raytracer.matrices, raytracer.tuples
 
 class TestMatrices(unittest.TestCase):
 
@@ -157,9 +157,137 @@ class TestMatrices(unittest.TestCase):
     def test_identity_matrix_transpose(self):
         """Test that the transpose of the identity matrix is identity"""
 
-        ident1 = raytracer.matrices.IdentityMatrix(5)
+        ident = raytracer.matrices.IdentityMatrix(5)
         self.assertEqual(ident.transpose(), ident)
 
+
+    def test_determinant_2_by_2(self):
+        """Test we can calculate the determinant of a 2x2 matrix"""
+
+        M = raytracer.matrices.Matrix(2, 2)
+        M.set_row(0, [1, 5])
+        M.set_row(1, [-3, 2])
+
+        self.assertEqual(M.det(), 17)
+
+    def test_determinant_3_by_3(self):
+        """Test we can calculate the determinant of a 3x3 matrix"""
+
+        M = raytracer.matrices.Matrix(3, 3)
+        M.set_row(0, [1, 2, 6])
+        M.set_row(1, [-5, 8, -4])
+        M.set_row(2, [2, 6, 4])
+
+        self.assertEqual(M.cofactor(0, 0), 56)
+        self.assertEqual(M.cofactor(0, 1), 12)
+        self.assertEqual(M.cofactor(0, 2), -46)
+        self.assertEqual(M.det(), -196)
+
+    def test_determinant_4_by_4(self):
+        """Test we can calculate the determinant of a 4x4 matrix"""
+
+        M = raytracer.matrices.Matrix(4, 4)
+        M.set_row(0, [-2, -8, 3, 5])
+        M.set_row(1, [-3, 1, 7, 3])
+        M.set_row(2, [1, 2, -9, 6])
+        M.set_row(3, [-6, 7, 7, -9])
+
+        self.assertEqual(M.cofactor(0, 0), 690)
+        self.assertEqual(M.cofactor(0, 1), 447)
+        self.assertEqual(M.cofactor(0, 2), 210)
+        self.assertEqual(M.cofactor(0, 3), 51)
+        self.assertEqual(M.det(), -4071)
+
+    def test_get_submatrix(self):
+        """Test we can calculate submatrices"""
+
+        # First up a 3x3 example
+        M = raytracer.matrices.Matrix(3, 3)
+        M.set_row(0, [1, 5, 0])
+        M.set_row(1, [-3, 2, 7])
+        M.set_row(2, [0, 6, -3])
+
+        result = M.submatrix(0, 2)
+
+        expected = raytracer.matrices.Matrix(2, 2)
+        expected.set_row(0, [-3, 2])
+        expected.set_row(1, [0, 6])
+
+        self.assertEqual(result, expected)
+
+        # Then a 4x4 example
+        M = raytracer.matrices.Matrix(4, 4)
+        M.set_row(0, [-6, 1, 1, 6])
+        M.set_row(1, [-8, 5, 8, 6])
+        M.set_row(2, [-1, 0, 8, 2])
+        M.set_row(3, [-7, 1, -1, 1])
+
+        result = M.submatrix(2, 1)
+
+        expected = raytracer.matrices.Matrix(3, 3)
+        expected.set_row(0, [-6, 1, 6])
+        expected.set_row(1, [-8, 8, 6])
+        expected.set_row(2, [-7, -7, 1])
+
+    def test_minor_3_by_3(self):
+        """Test we can calculate the minor of a 3x3 matrix"""
+
+        M = raytracer.matrices.Matrix(3, 3)
+        M.set_row(0, [3, 5, 0])
+        M.set_row(1, [2, -1, -7])
+        M.set_row(2, [6, -1, 5])
+
+        result = M.minor(1, 0)
+
+        self.assertEqual(result, M.submatrix(1, 0).det())
+        self.assertEqual(result, 25)
+
+    def test_cofactor_3_by_3(self):
+        """Test we can calculate the cofactors of a 3x3 matrix"""
+
+        M = raytracer.matrices.Matrix(3, 3)
+        M.set_row(0, [3, 5, 0])
+        M.set_row(1, [2, -1, -7])
+        M.set_row(2, [6, -1, 5])
+
+        self.assertEqual(M.minor(0, 0), -12)
+        self.assertEqual(M.cofactor(0, 0), -12)
+        self.assertEqual(M.minor(1, 0), 25)
+        self.assertEqual(M.cofactor(1, 0), -25)
+
+    def test_inverse(self):
+        """Test various matrix inversions"""
+
+        M = raytracer.matrices.Matrix(4, 4)
+        M.set_row(0, [-4, 2, -2, -3])
+        M.set_row(1, [9, 6, 2, 6])
+        M.set_row(2, [0, -5, 1, -5])
+        M.set_row(3, [0, 0, 0, 0])
+
+        with self.assertRaises(raytracer.exceptions.CannotInvertMatrixError):
+            M.inverse()
+
+        M = raytracer.matrices.Matrix(4, 4)
+        M.set_row(0, [-5, 2, 6, -8])
+        M.set_row(1, [1, -5, 1, 8])
+        M.set_row(2, [7, 7, -6, -7])
+        M.set_row(3, [1, -3, 7, 4])
+
+        B = M.inverse()
+        self.assertEqual(M.det(), 532)
+
+        self.assertEqual(M.cofactor(2, 3), -160)
+        self.assertEqual(B.get(3, 2), -160/532)
+        self.assertEqual(B.get(2, 3), 105/532)
+        self.assertEqual(M.cofactor(3, 2), 105)
+
+        expected = raytracer.matrices.Matrix(4, 4)
+        expected.set_row(0, [0.21805,  0.45113,  0.24060, -0.04511])
+        expected.set_row(1, [-0.80827, -1.45677, -0.44361,  0.52068])
+        expected.set_row(2, [-0.07895, -0.22368, -0.05263,  0.19737])
+        expected.set_row(3, [-0.52256, -0.81391, -0.30075,  0.30639])
+
+        self.assertEqual(B, expected)
 
 if __name__ == "__main__":
     unittest.main()
