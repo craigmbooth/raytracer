@@ -57,7 +57,9 @@ class Canvas:
 
         return header+content_string
 
-    def to_ppm(self, filename):
+    def to_ppm(self, filename: str) -> None:
         """Write the canvas out to a file with the given filename"""
 
         content = self._get_ppm_file_content()
+        with open(filename, "w") as f:
+            f.write(content)
