@@ -1,3 +1,4 @@
+import math
 import unittest
 
 import raytracer.exceptions
@@ -82,13 +83,81 @@ class TestScale(unittest.TestCase):
 
 
     def test_scaling_reflection(self):
-        """Test we can reflect ap oint about an exis using the scaling matrix"""
+        """Test we can reflect a point about an axis using the scaling matrix"""
 
         S = raytracer.transforms.Scale(-1, 1, 1)
         p = raytracer.points.Point(-4, 6, 8)
 
         p2 = S * p
         self.assertEqual(p2, raytracer.points.Point(4, 6, 8))
+
+class TestRotate(unittest.TestCase):
+    """Tests on the rotation matrices"""
+
+    def test_rotate_x(self):
+        """Test we can rotate about the x-axis"""
+
+        p = raytracer.points.Point(0, 1, 0)
+
+        half_quarter = raytracer.transforms.RotateX(math.pi/4)
+        full_quarter = raytracer.transforms.RotateX(math.pi/2)
+
+        p2 = half_quarter * p
+        p3 = full_quarter * p
+
+        self.assertEqual(p2,
+            raytracer.points.Point(0, math.sqrt(2)/2, math.sqrt(2)/2))
+
+        self.assertEqual(p3,
+            raytracer.points.Point(0, 0, 1))
+
+    def test_rotate_x_inverse(self):
+        """Test that roating by the inverse of a rotation rotates the other way
+        """
+
+        p = raytracer.points.Point(0, 1, 0)
+        full_quarter = raytracer.transforms.RotateX(math.pi/2)
+
+        p2 = full_quarter.inverse()*p
+
+        self.assertEqual(p2,
+            raytracer.points.Point(0, 0, -1))
+
+    def test_rotate_y(self):
+        """Test we can rotate about the y-axis"""
+
+        p = raytracer.points.Point(0, 0, 1)
+
+        half_quarter = raytracer.transforms.RotateY(math.pi/4)
+        full_quarter = raytracer.transforms.RotateY(math.pi/2)
+
+        p2 = half_quarter * p
+        p3 = full_quarter * p
+
+        self.assertEqual(p2,
+            raytracer.points.Point(math.sqrt(2)/2, 0, math.sqrt(2)/2))
+
+        self.assertEqual(p3,
+            raytracer.points.Point(1, 0, 0))
+
+
+    def test_rotate_z(self):
+        """Test we can rotate about the y-axis"""
+
+        p = raytracer.points.Point(0, 1, 0)
+
+        half_quarter = raytracer.transforms.RotateZ(math.pi/4)
+        full_quarter = raytracer.transforms.RotateZ(math.pi/2)
+
+        p2 = half_quarter * p
+        p3 = full_quarter * p
+
+        self.assertEqual(p2,
+            raytracer.points.Point(-math.sqrt(2)/2, math.sqrt(2)/2, 0))
+
+        self.assertEqual(p3,
+            raytracer.points.Point(-1, 0, 0))
+
 
 if __name__ == "__main__":
     unittest.main()

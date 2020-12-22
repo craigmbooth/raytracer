@@ -1,4 +1,4 @@
-import copy
+import math
 import numbers
 
 import raytracer.exceptions, raytracer.matrices, raytracer.tuples
@@ -43,3 +43,66 @@ class Scale(Identity):
         self.set(0, 0, x)
         self.set(1, 1, y)
         self.set(2, 2, z)
+
+
+class RotateX(Identity):
+    def __init__(self, r, degrees=False):
+        """ Given an angle in radians, rotates the point around the x-axis
+        by that amount
+
+        [ 1 0      0       0
+          0 cos(r) -sin(r) 0
+          0 sin(r) cos(r)  0
+          0 0      0       1 ]
+        """
+
+        if degrees is True:
+            r *= 2 * math.pi / 360
+
+        super().__init__(4)
+        self.set(1, 1, math.cos(r))
+        self.set(1, 2, -math.sin(r))
+        self.set(2, 1, math.sin(r))
+        self.set(2, 2, math.cos(r))
+
+
+class RotateY(Identity):
+    def __init__(self, r, degrees=False):
+        """ Given an angle in radians, rotates the point around the y-axis
+        by that amount
+
+        [ cos(r) 0      sin(r)  0
+          0      1      0       0
+         -sin(r) 0      cos(r)  0
+          0      0      0       1 ]
+        """
+
+        if degrees is True:
+            r *= 2 * math.pi / 360
+
+        super().__init__(4)
+        self.set(0, 0, math.cos(r))
+        self.set(0, 3, math.sin(r))
+        self.set(2, 0, -math.sin(r))
+        self.set(2, 2, math.cos(r))
+
+
+class RotateZ(Identity):
+    def __init__(self, r, degrees=False):
+        """ Given an angle in radians, rotates the point around the z-axis
+        by that amount
+
+        [ cos(r) -sin(r) 0 0
+          sin(r) cos(r)  0 0
+          0      0       1 0
+          0      0       0 1
+        """
+
+        if degrees is True:
+            r *= 2 * math.pi / 360
+
+        super().__init__(4)
+        self.set(0, 0, math.cos(r))
+        self.set(0, 1, -math.sin(r))
+        self.set(1, 0, math.sin(r))
+        self.set(1, 1, math.cos(r))
