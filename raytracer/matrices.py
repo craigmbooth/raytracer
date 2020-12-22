@@ -163,10 +163,3 @@ class Matrix:
                 # transpose under the hood
                 m.set(col, row, c / determinant)
         return m
-
-class IdentityMatrix(Matrix):
-
-    def __init__(self, size):
-        super().__init__(size, size)
-        for i in range(size):
-            self.set(i, i, 1)

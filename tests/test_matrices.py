@@ -120,22 +120,6 @@ class TestMatrices(unittest.TestCase):
         self.assertEqual(t2, raytracer.tuples.Tuple(
             ["x", "y", "z", "w"], 18, 24, 33, 1))
 
-    def test_identity_matrix_mult(self):
-        """Test we can identify the identity matrix by a matrix and tuple"""
-
-        ident = raytracer.matrices.IdentityMatrix(3)
-
-        M = raytracer.matrices.Matrix(3, 3)
-        M.set_row(0, [1, 2, 3])
-        M.set_row(1, [3, 2, 1])
-        M.set_row(2, [2, 4, 6])
-
-        M2 = M * ident
-        self.assertEqual(M2, M)
-
-        t = raytracer.tuples.Tuple(["a", "b", "c"], 1, 2, 3)
-        t2 = ident * t
-        self.assertEqual(t2, t)
 
     def test_matrix_transpose(self):
         """Test we can transpose a matrix"""
@@ -153,13 +137,6 @@ class TestMatrices(unittest.TestCase):
         expected.set_row(2, [3, 1, 6])
 
         self.assertTrue(M == expected)
-
-    def test_identity_matrix_transpose(self):
-        """Test that the transpose of the identity matrix is identity"""
-
-        ident = raytracer.matrices.IdentityMatrix(5)
-        self.assertEqual(ident.transpose(), ident)
-
 
     def test_determinant_2_by_2(self):
         """Test we can calculate the determinant of a 2x2 matrix"""
@@ -288,6 +265,60 @@ class TestMatrices(unittest.TestCase):
         expected.set_row(3, [-0.52256, -0.81391, -0.30075,  0.30639])
 
         self.assertEqual(B, expected)
+
+        # Since this calculation is fundamental and bugs are painful,
+        # invert a few more matrices with known answers
+
+        M = raytracer.matrices.Matrix(4, 4)
+        M.set_row(0, [8, -5, 9, 2])
+        M.set_row(1, [7, 5, 6, 1])
+        M.set_row(2, [-6, 0, 9, 6])
+        M.set_row(3, [-3, 0, -9, -4])
+
+        expected = raytracer.matrices.Matrix(4, 4)
+        expected.set_row(0, [-0.15385, -0.15385, -0.28205, -0.53846])
+        expected.set_row(1, [-0.07692,  0.12308,  0.02564,  0.03077])
+        expected.set_row(2, [0.35897,  0.35897,  0.43590,  0.92308])
+        expected.set_row(3, [-0.69231, -0.69231, -0.76923, -1.92308])
+
+        self.assertEqual(M.inverse(), expected)
+
+        M = raytracer.matrices.Matrix(4, 4)
+        M.set_row(0, [9, 3, 0, 9])
+        M.set_row(1, [-5, -2, -6, -3])
+        M.set_row(2, [-4, 9, 6, 4])
+        M.set_row(3, [-7, 6, 6, 2])
+
+        expected = raytracer.matrices.Matrix(4, 4)
+        expected.set_row(0, [-0.04074, -0.07778,  0.14444, -0.22222])
+        expected.set_row(1, [-0.07778,  0.03333,  0.36667, -0.33333])
+        expected.set_row(2, [-0.02901, -0.14630, -0.10926,  0.12963])
+        expected.set_row(3, [0.17778,  0.06667, -0.26667,  0.33333])
+
+        self.assertEqual(M.inverse(), expected)
+
+
+    def test_inverse_self_multiply(self):
+        """Test that multipling a matrix by its inverse does what is expected"""
+
+        A = raytracer.matrices.Matrix(4, 4)
+        A.set_row(0, [3, -9, 7, 3])
+        A.set_row(1, [3, -8, 2, -9])
+        A.set_row(2, [-4, 4, 4, 1])
+        A.set_row(3, [-6, 5, -1, 1])
+
+        B = raytracer.matrices.Matrix(4, 4)
+        B.set_row(0, [8, 2, 2, 2])
+        B.set_row(1, [3, -1, 7, 0])
+        B.set_row(2, [7, 0, 5, 4])
+        B.set_row(3, [6, -2, 0, 5])
+
+        C = A * B
+
+        self.assertEqual(C*B.inverse(), A)
+
+
+
 
 if __name__ == "__main__":
     unittest.main()
