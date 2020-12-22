@@ -31,5 +31,15 @@ class TestColors(unittest.TestCase):
         self.assertEqual(c5, raytracer.colors.Color(1.8, 1.2, 1.5))
 
 
+    def test_color_multiplication(self):
+        """Test that we can multiple two colors"""
+
+        c1 = raytracer.colors.Color(1, 0.2, 0.4)
+        c2 = raytracer.colors.Color(0.9, 1, 0.1)
+
+        c3 = c1 * c2
+
+        self.assertEqual(c3, raytracer.colors.Color(0.9, 0.2, 0.04))
+
 if __name__ == "__main__":
     unittest.main()
