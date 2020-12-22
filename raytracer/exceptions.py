@@ -1,0 +1,2 @@
+class IncompatibleLengthError(Exception):
+    pass

@@ -1,7 +1,6 @@
 import math
 
-class IncompatibleLengthError(Exception):
-    pass
+import raytracer.exceptions
 
 class Tuple:
     """ This class represents a generic tuple.
@@ -15,19 +14,21 @@ class Tuple:
         """
 
         if len(fillables) != len(args):
-            raise IncompatibleLengthError
+            raise exceptions.IncompatibleLengthError
 
         self.fillables = fillables
         for fillable, arg in zip(fillables, args):
             setattr(self, fillable, arg)
 
     def __repr__(self):
-        return f"Tuple [{self.x}, {self.y}, {self.z}]"
+        tuple_string = " ".join([f"{f}={getattr(self, f)}" for
+                                 f in self.fillables])
+        return f"Tuple [{tuple_string}]"
 
     def __add__(self, other):
 
         if len(self.fillables) != len(other.fillables):
-            raise IncompatibleLengthError
+            raise exceptions.IncompatibleLengthError
 
         output_fillables = [
             getattr(self, f[0]) + getattr(other, f[1]) for
@@ -38,7 +39,7 @@ class Tuple:
     def __sub__(self, other):
 
         if len(self.fillables) != len(other.fillables):
-            raise IncompatibleLengthError
+            raise exceptions.IncompatibleLengthError
 
         output_fillables = [
             getattr(self, f[0]) - getattr(other, f[1]) for
@@ -85,6 +86,9 @@ class Tuple:
                 return False
         else:
             return True
+
+    def values(self):
+        return [getattr(self, f) for f in self.fillables]
 
     def magnitude(self):
         """Return the magnitude of the tuple"""
