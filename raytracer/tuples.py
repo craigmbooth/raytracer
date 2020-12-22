@@ -1,3 +1,5 @@
+import math
+
 class IncompatibleTypeError(Exception):
     pass
 
@@ -27,6 +29,9 @@ class Tuple:
     def point(cls, x, y, z):
         return cls(x, y, z, 1)
 
+    def magnitude(self):
+        return math.sqrt(self.x**2 + self.y**2 + self.z**2)
+
     def __add__(self, other):
         return Tuple(
             self.x+other.x,
@@ -54,6 +59,14 @@ class Tuple:
             self.y * other,
             self.z * other,
             self.w * other)
+
+    def __truediv__(self, other):
+        return Tuple(
+            self.x / other,
+            self.y / other,
+            self.z / other,
+            self.w / other)
+
 
     @staticmethod
     def _close(x, y, epsilon=1e-6):
