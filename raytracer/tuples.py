@@ -57,7 +57,7 @@ class Tuple:
     def __mul__(self, other):
 
         output_fillables = [
-            getattr(self, f[0]) * other for f in self.fillables]
+            getattr(self, f) * other for f in self.fillables]
 
         return Tuple(self.fillables, *output_fillables)
 
@@ -80,7 +80,7 @@ class Tuple:
             return False
 
         for f1, f2 in zip(self.fillables, other.fillables):
-            if ((getattr(self, f1) != getattr(other, f2)) or
+            if (not self._close(getattr(self, f1), getattr(other, f2)) or
                 (f1 != f2)):
                 return False
         else:
