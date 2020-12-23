@@ -1,2 +1,7 @@
 \#*
 .\#*
+
+# Generated images
+*.png
+*.ppm
+*.gif

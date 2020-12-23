@@ -70,7 +70,7 @@ class Tuple:
         return Tuple(self.fillables, *output_fillables)
 
     @staticmethod
-    def _close(x, y, epsilon=1e-6):
+    def _close(x, y, epsilon=1e-3):
         """Utility function, returns True if two numbers are close, else false
         """
         return True if abs(x-y) < epsilon else False
@@ -113,6 +113,11 @@ class Tuple:
         """
         return sum([getattr(self, x) * getattr(other, x)
                     for x in self.fillables])
+
+    def reflect(self, normal):
+        """Reflects  self against a surface perpendicular to normal"""
+        return self - normal * 2 * self.dot(normal)
+
 
     def apply(self, M):
         """Does M * self and returns the resultant point"""

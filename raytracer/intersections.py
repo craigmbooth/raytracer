@@ -8,6 +8,8 @@ class Intersection:
 
     def __repr__(self):
         return f"Intersection at t={self.t} with {self.shape}"
+
+
 class Intersections:
 
     def __init__(self, *args):

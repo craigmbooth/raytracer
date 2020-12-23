@@ -135,5 +135,20 @@ class TestTuples(unittest.TestCase):
         self.assertEqual(a1.normalize().magnitude(), 1)
 
 
+    def test_reflection_vector(self):
+        """Test we can calculate reflections"""
+
+        # A ray approaching at 45 degrees
+        v = raytracer.vectors.Vector(1, -1, 0)
+        n =  raytracer.vectors.Vector(0, 1, 0)
+        r = v.reflect(n)
+        self.assertEqual(r, raytracer.vectors.Vector(1, 1, 0))
+
+        # Ray along an axis hits a surface at an angle
+        v = raytracer.vectors.Vector(0, -1, 0)
+        n =  raytracer.vectors.Vector(math.sqrt(2)/2, math.sqrt(2)/2, 0)
+        r = v.reflect(n)
+        self.assertEqual(r, raytracer.vectors.Vector(1, 0, 0))
+
 if __name__ == "__main__":
     unittest.main()
