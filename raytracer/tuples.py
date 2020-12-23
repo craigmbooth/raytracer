@@ -107,3 +107,7 @@ class Tuple:
             getattr(self, f[0]) / magnitude for f in self.fillables]
 
         return Tuple(self.fillables, *output_fillables)
+
+    def apply(self, M):
+        """Does M * self and returns the resultant point"""
+        return M * self
