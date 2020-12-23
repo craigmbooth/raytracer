@@ -106,3 +106,22 @@ class RotateZ(Identity):
         self.set(0, 1, -math.sin(r))
         self.set(1, 0, math.sin(r))
         self.set(1, 1, math.cos(r))
+
+
+class Shear(Identity):
+    """The shearing matrix expands each direction relative to another direction
+    [ 1   x_y x_z  0
+      y_x 1   y_z  0
+      z_x z_y 1    0
+      0   0   0    1 ]
+    """
+    def __init__(self, x_y, x_z, y_x, y_z, z_x, z_y):
+
+        super().__init__(4)
+
+        self.set(0, 1, x_y)
+        self.set(0, 2, x_z)
+        self.set(1, 0, y_x)
+        self.set(1, 2, y_z)
+        self.set(2, 0, z_x)
+        self.set(2, 1, z_y)

@@ -159,5 +159,39 @@ class TestRotate(unittest.TestCase):
             raytracer.points.Point(-1, 0, 0))
 
 
+class TestShearing(unittest.TestCase):
+    """Tests on the shearing matrices"""
+
+    def test_all_shear_axes(self):
+        p = raytracer.points.Point(2, 3, 4)
+
+        S1 = raytracer.transforms.Shear(1, 0, 0, 0, 0, 0)
+        p1 = S1 * p
+        self.assertEqual(p1, raytracer.points.Point(5, 3, 4))
+
+        S1 = raytracer.transforms.Shear(0, 1, 0, 0, 0, 0)
+        p1 = S1 * p
+        self.assertEqual(p1, raytracer.points.Point(6, 3, 4))
+
+        S1 = raytracer.transforms.Shear(0, 0, 1, 0, 0, 0)
+        p1 = S1 * p
+        self.assertEqual(p1, raytracer.points.Point(2, 5, 4))
+
+        S1 = raytracer.transforms.Shear(0, 0, 0, 1, 0, 0)
+        p1 = S1 * p
+        self.assertEqual(p1, raytracer.points.Point(2, 7, 4))
+
+        S1 = raytracer.transforms.Shear(0, 0, 0, 0, 1, 0)
+        p1 = S1 * p
+        self.assertEqual(p1, raytracer.points.Point(2, 3, 6))
+
+        S1 = raytracer.transforms.Shear(0, 0, 0, 0, 0, 1)
+        p1 = S1 * p
+        self.assertEqual(p1, raytracer.points.Point(2, 3, 7))
+
+
+
+
+
 if __name__ == "__main__":
     unittest.main()
