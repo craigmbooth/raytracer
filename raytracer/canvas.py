@@ -1,31 +1,35 @@
-import raytracer.colors
+import colors
+
+from numbers import Number
+from typing import Union
 
 MAX_LINE_LEN = 70
 
 class Canvas:
 
-    def __init__(self, width: int, height: int):
+    def __init__(self, width: int, height: int) -> None:
 
         self.width = width
         self.height = height
 
-        self.canvas = [[raytracer.colors.Color(0, 0, 0)] * height for
+        self.canvas = [[colors.Color(0, 0, 0)] * height for
                            _ in range(width)]
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Canvas [w={self.width}, h={self.height}]"
 
-    def set(self, x, y, color: raytracer.colors.Color):
+    def set(self, x: int, y: int, color: colors.Color) -> None:
         self.canvas[x][y] = color
 
-    def get(self, x, y) -> raytracer.colors.Color:
+    def get(self, x: int, y: int) -> colors.Color:
         return self.canvas[x][y]
 
     @staticmethod
-    def clamp(minval, x, maxval):
+    def clamp(minval: Union[int, float], x: Union[int, float],
+              maxval: Union[int, float]) -> float:
         return min(max(minval, x), maxval)
 
-    def _get_ppm_file_content(self):
+    def _get_ppm_file_content(self) -> str:
         """Convert the canvas into a string containing the PPM file content"""
         header = f"P3\n{self.width} {self.height}\n255\n"
 

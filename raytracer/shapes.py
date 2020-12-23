@@ -1,17 +1,17 @@
 import math
 import uuid
 
-import raytracer.intersections
-import raytracer.materials
-import raytracer.points
-import raytracer.rays
-import raytracer.transforms
+import intersections
+import materials
+import points
+import rays
+import transforms
 
 class Shape:
 
-    def __init__(self, material=raytracer.materials.Material()):
+    def __init__(self, material=materials.Material()):
         self.id = uuid.uuid4()
-        self.transform = raytracer.transforms.Identity(4)
+        self.transform = transforms.Identity(4)
         self.material = material
 
     def __eq__(self, other):
@@ -21,20 +21,20 @@ class Shape:
         """Sets the shape's transform to the matrix M"""
         self.transform = M
 
-    def intersect(self):
+    def intersect(self, ray: rays.Ray):
         raise NotImplementedError
 
-    def normal_at(self):
+    def normal_at(self, point: points.Point):
         raise NotImplementedError
 
 class Sphere(Shape):
 
-    def intersect(self, ray: raytracer.rays.Ray):
+    def intersect(self, ray: rays.Ray):
 
         # Transform the ray by the inverse of the sphere's transform
         r2 = ray.transform(self.transform.inverse())
 
-        sphere_to_ray = r2.origin - raytracer.points.Point(0, 0, 0)
+        sphere_to_ray = r2.origin - points.Point(0, 0, 0)
 
         a = r2.direction.dot(r2.direction)
         b = 2 * r2.direction.dot(sphere_to_ray)
@@ -42,19 +42,19 @@ class Sphere(Shape):
         discriminant = b**2 - 4 * a * c
 
         if discriminant < 0:
-            return raytracer.intersections.Intersections()
+            return intersections.Intersections()
         else:
             t1 = (-b - math.sqrt(discriminant)) / (2 * a)
             t2 = (-b + math.sqrt(discriminant)) / (2 * a)
-            return raytracer.intersections.Intersections(
-                raytracer.intersections.Intersection(self, t1),
-                raytracer.intersections.Intersection(self, t2))
+            return intersections.Intersections(
+                intersections.Intersection(self, t1),
+                intersections.Intersection(self, t2))
 
 
-    def normal_at(self, point: raytracer.points.Point):
+    def normal_at(self, point: points.Point):
 
         object_point = self.transform.inverse() * point
-        object_normal = object_point - raytracer.points.Point(0, 0, 0)
+        object_normal = object_point - points.Point(0, 0, 0)
 
         world_normal = self.transform.inverse().transpose() * object_normal
         world_normal.w = 0

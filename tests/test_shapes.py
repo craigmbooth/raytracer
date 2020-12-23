@@ -1,20 +1,20 @@
 import math
 import unittest
 
-import raytracer.materials
-import raytracer.points
-import raytracer.rays
-import raytracer.shapes
-import raytracer.transforms
-import raytracer.vectors
+import materials
+import points
+import rays
+import shapes
+import transforms
+import vectors
 
 class TestSphere(unittest.TestCase):
 
     def test_intersection_standard(self):
         """Test we can identify what points a ray intersects with a sphere"""
-        s = raytracer.shapes.Sphere()
-        r = raytracer.rays.Ray(raytracer.points.Point(0, 0, -5),
-                               raytracer.vectors.Vector(0, 0, 1))
+        s = shapes.Sphere()
+        r = rays.Ray(points.Point(0, 0, -5),
+                               vectors.Vector(0, 0, 1))
 
         result = s.intersect(r)
 
@@ -27,9 +27,9 @@ class TestSphere(unittest.TestCase):
         """Test we can identify what points a ray intersects with a sphere when
         it glances"""
 
-        s = raytracer.shapes.Sphere()
-        r = raytracer.rays.Ray(raytracer.points.Point(0, 1, -5),
-                               raytracer.vectors.Vector(0, 0, 1))
+        s = shapes.Sphere()
+        r = rays.Ray(points.Point(0, 1, -5),
+                               vectors.Vector(0, 0, 1))
 
         result = s.intersect(r)
 
@@ -42,18 +42,18 @@ class TestSphere(unittest.TestCase):
     def test_intersection_miss(self):
         """Test we handle the case where the ray misses the sphere"""
 
-        s = raytracer.shapes.Sphere()
-        r = raytracer.rays.Ray(raytracer.points.Point(0, 2, -5),
-                               raytracer.vectors.Vector(0, 0, 1))
+        s = shapes.Sphere()
+        r = rays.Ray(points.Point(0, 2, -5),
+                               vectors.Vector(0, 0, 1))
 
         self.assertEqual(s.intersect(r), [])
 
     def test_intersection_inside(self):
         """Test we handle the case where the ray starts inside the sphere"""
 
-        s = raytracer.shapes.Sphere()
-        r = raytracer.rays.Ray(raytracer.points.Point(0, 0, 0),
-                               raytracer.vectors.Vector(0, 0, 1))
+        s = shapes.Sphere()
+        r = rays.Ray(points.Point(0, 0, 0),
+                               vectors.Vector(0, 0, 1))
 
         result = s.intersect(r)
 
@@ -65,9 +65,9 @@ class TestSphere(unittest.TestCase):
     def test_intersection_behind(self):
         """Test we handle the case where the ray starts inside the sphere"""
 
-        s = raytracer.shapes.Sphere()
-        r = raytracer.rays.Ray(raytracer.points.Point(0, 0, 5),
-                               raytracer.vectors.Vector(0, 0, 1))
+        s = shapes.Sphere()
+        r = rays.Ray(points.Point(0, 0, 5),
+                               vectors.Vector(0, 0, 1))
 
         result = s.intersect(r)
 
@@ -79,26 +79,26 @@ class TestSphere(unittest.TestCase):
     def test_default_transform(self):
         """Test that we get the identity matrix as the default transform"""
 
-        s = raytracer.shapes.Sphere()
-        self.assertEqual(s.transform, raytracer.transforms.Identity(4))
+        s = shapes.Sphere()
+        self.assertEqual(s.transform, transforms.Identity(4))
 
     def test_changed_transform(self):
         """Test that we can change the transform on a shape"""
 
-        s = raytracer.shapes.Sphere()
-        s.set_transform(raytracer.transforms.Translate(6, 7, 8))
-        self.assertEqual(s.transform, raytracer.transforms.Translate(6, 7, 8))
+        s = shapes.Sphere()
+        s.set_transform(transforms.Translate(6, 7, 8))
+        self.assertEqual(s.transform, transforms.Translate(6, 7, 8))
 
     def test_intersections_with_transformed_ray__scaling(self):
         """Test we get the correct intersections after adding a scaling
         to a shape
         """
 
-        s = raytracer.shapes.Sphere()
-        s.set_transform(raytracer.transforms.Scale(2, 2, 2))
+        s = shapes.Sphere()
+        s.set_transform(transforms.Scale(2, 2, 2))
 
-        r = raytracer.rays.Ray(raytracer.points.Point(0, 0, -5),
-                               raytracer.vectors.Vector(0, 0, 1))
+        r = rays.Ray(points.Point(0, 0, -5),
+                               vectors.Vector(0, 0, 1))
 
         result = s.intersect(r)
         self.assertEqual(result[0].t, 3)
@@ -111,11 +111,11 @@ class TestSphere(unittest.TestCase):
         to a shape
         """
 
-        s = raytracer.shapes.Sphere()
-        s.set_transform(raytracer.transforms.Translate(5, 0, 0))
+        s = shapes.Sphere()
+        s.set_transform(transforms.Translate(5, 0, 0))
 
-        r = raytracer.rays.Ray(raytracer.points.Point(0, 0, -5),
-                               raytracer.vectors.Vector(0, 0, 1))
+        r = rays.Ray(points.Point(0, 0, -5),
+                               vectors.Vector(0, 0, 1))
 
         result = s.intersect(r)
         self.assertTrue(len(result) == 0)
@@ -123,47 +123,47 @@ class TestSphere(unittest.TestCase):
     def test_normal_at__non_transformed(self):
         """Test we can calculate normal vectors on the unit sphere"""
 
-        s = raytracer.shapes.Sphere()
+        s = shapes.Sphere()
 
-        n = s.normal_at(raytracer.points.Point(1, 0, 0))
-        self.assertEqual(n, raytracer.vectors.Vector(1, 0, 0))
+        n = s.normal_at(points.Point(1, 0, 0))
+        self.assertEqual(n, vectors.Vector(1, 0, 0))
 
-        n = s.normal_at(raytracer.points.Point(0, 1, 0))
-        self.assertEqual(n, raytracer.vectors.Vector(0, 1, 0))
+        n = s.normal_at(points.Point(0, 1, 0))
+        self.assertEqual(n, vectors.Vector(0, 1, 0))
 
-        n = s.normal_at(raytracer.points.Point(0, 0, 1))
-        self.assertEqual(n, raytracer.vectors.Vector(0, 0, 1))
+        n = s.normal_at(points.Point(0, 0, 1))
+        self.assertEqual(n, vectors.Vector(0, 0, 1))
 
         sqrt3d3 = math.sqrt(3)/3
-        n = s.normal_at(raytracer.points.Point(sqrt3d3, sqrt3d3, sqrt3d3))
-        self.assertEqual(n, raytracer.vectors.Vector(sqrt3d3, sqrt3d3, sqrt3d3))
+        n = s.normal_at(points.Point(sqrt3d3, sqrt3d3, sqrt3d3))
+        self.assertEqual(n, vectors.Vector(sqrt3d3, sqrt3d3, sqrt3d3))
 
     def test_normal_at__transformed(self):
         """Test we can calculate normal vectors on a transformed sphere"""
 
-        s = raytracer.shapes.Sphere()
-        s.set_transform(raytracer.transforms.Translate(0, 1, 0))
-        n = s.normal_at(raytracer.points.Point(0, 1.70711, -0.70711))
+        s = shapes.Sphere()
+        s.set_transform(transforms.Translate(0, 1, 0))
+        n = s.normal_at(points.Point(0, 1.70711, -0.70711))
 
-        self.assertEqual(n, raytracer.vectors.Vector(0, 0.70711, -0.70711))
+        self.assertEqual(n, vectors.Vector(0, 0.70711, -0.70711))
 
-        s.set_transform(raytracer.transforms.Scale(1, 0.5, 1) *
-                       raytracer.transforms.RotateZ(math.pi/5))
+        s.set_transform(transforms.Scale(1, 0.5, 1) *
+                       transforms.RotateZ(math.pi/5))
 
-        n = s.normal_at(raytracer.points.Point(0, math.sqrt(2)/2, -math.sqrt(2)/2))
-        self.assertEqual(n, raytracer.vectors.Vector(0, 0.97014, -0.24254))
+        n = s.normal_at(points.Point(0, math.sqrt(2)/2, -math.sqrt(2)/2))
+        self.assertEqual(n, vectors.Vector(0, 0.97014, -0.24254))
 
     def test_default_material(self):
         """Test that a shape has the default material"""
-        s = raytracer.shapes.Sphere()
-        self.assertEqual(s.material, raytracer.materials.Material())
+        s = shapes.Sphere()
+        self.assertEqual(s.material, materials.Material())
 
     def test_altered_material(self):
         """Test that a shape has the default material"""
-        s = raytracer.shapes.Sphere(
-            material=raytracer.materials.Material(shininess=100))
+        s = shapes.Sphere(
+            material=materials.Material(shininess=100))
         self.assertEqual(s.material,
-                         raytracer.materials.Material(shininess=100))
+                         materials.Material(shininess=100))
 
 if __name__ == "__main__":
     unittest.main()

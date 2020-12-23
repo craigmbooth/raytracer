@@ -1,14 +1,14 @@
 import unittest
 
-import raytracer.canvas
-import raytracer.colors
+import canvas
+import colors
 
 class TestCanvas(unittest.TestCase):
 
     def test_empty_canvas(self):
         """Test that an empty canvas is filled with black pixels"""
 
-        c = raytracer.canvas.Canvas(10, 20)
+        c = canvas.Canvas(10, 20)
 
         self.assertEqual(len(c.canvas), 10)
         self.assertEqual(len(c.canvas[0]), 20)
@@ -16,14 +16,14 @@ class TestCanvas(unittest.TestCase):
         for i in range(10):
             for j in range(20):
                 self.assertEqual(c.canvas[i][j],
-                                 raytracer.colors.Color(0, 0, 0))
+                                 colors.Color(0, 0, 0))
 
 
     def test_write_to_canvas(self):
         """Test we can write to and read from a canvas"""
 
-        c = raytracer.canvas.Canvas(10, 20)
-        red = raytracer.colors.Color(1, 0, 0)
+        c = canvas.Canvas(10, 20)
+        red = colors.Color(1, 0, 0)
 
         c.set(2, 3, red)
 
@@ -33,10 +33,10 @@ class TestCanvas(unittest.TestCase):
     def test_ppm_file_content(self):
         """Test the content of the PPM header is correct"""
 
-        c = raytracer.canvas.Canvas(5, 3)
-        c1 = raytracer.colors.Color(1.5, 0, 0)
-        c2 = raytracer.colors.Color(0, 0.5, 0)
-        c3 = raytracer.colors.Color(-0.5, 0, 1)
+        c = canvas.Canvas(5, 3)
+        c1 = colors.Color(1.5, 0, 0)
+        c2 = colors.Color(0, 0.5, 0)
+        c3 = colors.Color(-0.5, 0, 1)
 
         c.set(0, 0, c1)
         c.set(2, 1, c2)
@@ -57,10 +57,10 @@ class TestCanvas(unittest.TestCase):
     def test_ppm_long_line_splitting(self):
         """Test that we split longer lines at or before 70 characters"""
 
-        c = raytracer.canvas.Canvas(10, 2)
+        c = canvas.Canvas(10, 2)
         for i in range(c.width):
             for j in range(c.height):
-                c.set(i, j, raytracer.colors.Color(1, 0.8, 0.6))
+                c.set(i, j, colors.Color(1, 0.8, 0.6))
 
         ppm_content = c._get_ppm_file_content()
         ppm_lines = ppm_content.split("\n")
@@ -80,7 +80,7 @@ class TestCanvas(unittest.TestCase):
         newline
         """
 
-        c = raytracer.canvas.Canvas(5, 3)
+        c = canvas.Canvas(5, 3)
         ppm_content = c._get_ppm_file_content()
         self.assertEqual(ppm_content[-1:], "\n")
 

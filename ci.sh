@@ -1,3 +1,5 @@
 #!/bin/bash
 
-python -m unittest discover tests/
+cd tests
+python -m unittest discover .
+cd -

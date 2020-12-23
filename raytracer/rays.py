@@ -1,10 +1,10 @@
-import raytracer.points
-import raytracer.vectors
+import points
+import vectors
 
 class Ray:
 
-    def __init__(self, origin: raytracer.points.Point,
-                 direction: raytracer.vectors.Vector):
+    def __init__(self, origin: points.Point,
+                 direction: vectors.Vector):
         """Initialize a ray with an origin and direction"""
 
         self.origin = origin

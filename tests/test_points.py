@@ -1,8 +1,8 @@
 import math
 import unittest
 
-import raytracer.tuples
-import raytracer.points
+import tuples
+import points
 
 class TestPoints(unittest.TestCase):
     """Tests on the Tuple class"""
@@ -10,7 +10,7 @@ class TestPoints(unittest.TestCase):
     def test_point__tuple(self):
         """Test that we can initialize and read from a point as a tuple"""
 
-        p = raytracer.tuples.Tuple(["x", "y", "z", "w"], 4.3, -4.2, 3.1, 1)
+        p = tuples.Tuple(["x", "y", "z", "w"], 4.3, -4.2, 3.1, 1)
 
         self.assertEqual(p.x, 4.3)
         self.assertEqual(p.y, -4.2)
@@ -21,7 +21,7 @@ class TestPoints(unittest.TestCase):
     def test_point(self):
         """Test that we can initialize and read from a point"""
 
-        p = raytracer.points.Point(4.3, -4.2, 3.1)
+        p = points.Point(4.3, -4.2, 3.1)
 
         self.assertEqual(p.x, 4.3)
         self.assertEqual(p.y, -4.2)

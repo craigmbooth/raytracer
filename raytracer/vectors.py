@@ -1,6 +1,6 @@
-import raytracer.tuples
+import tuples
 
-class Vector(raytracer.tuples.Tuple):
+class Vector(tuples.Tuple):
     """This class represents a vector between two points in space.  It is
     initialized with x, y, and z coordinates and then in this class we add a
     fourth component, w, which is 0 for a point

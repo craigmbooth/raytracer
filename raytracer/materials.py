@@ -1,16 +1,16 @@
 import math
 
-import raytracer.colors
-import raytracer.lights
-import raytracer.points
-import raytracer.vectors
+import colors
+import lights
+import points
+import vectors
 
-BLACK = raytracer.colors.Color(0, 0, 0)
+BLACK = colors.Color(0, 0, 0)
 
 class Material:
 
     def __init__(self, ambient=0.1, diffuse=0.9, specular=0.9, shininess=200.0,
-                 color=raytracer.colors.Color(1, 1, 1)):
+                 color=colors.Color(1, 1, 1)):
 
         self.ambient = ambient
         self.diffuse = diffuse
@@ -24,10 +24,10 @@ class Material:
 
 
     def lighting(self,
-                 light: raytracer.lights.Light,
-                 point: raytracer.points.Point,
-                 eyev: raytracer.vectors.Vector,
-                 normalv: raytracer.vectors.Vector) -> raytracer.colors.Color:
+                 light: lights.Light,
+                 point: points.Point,
+                 eyev: vectors.Vector,
+                 normalv: vectors.Vector) -> colors.Color:
 
         # combine the surface color with the light's color/intensity
         effective_color = self.color * light.intensity
@@ -63,7 +63,7 @@ class Material:
             factor = math.pow(reflect_dot_eye, self.shininess)
             specular = light.intensity * self.specular * factor
 
-        return raytracer.colors.Color(
+        return colors.Color(
             red=ambient.red + diffuse.red + specular.red,
             green=ambient.green + diffuse.green + specular.green,
             blue=ambient.blue + diffuse.blue + specular.blue)

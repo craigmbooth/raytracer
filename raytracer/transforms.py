@@ -1,9 +1,9 @@
 import math
 import numbers
 
-import raytracer.exceptions, raytracer.matrices, raytracer.tuples
+import exceptions, matrices, tuples
 
-class Identity(raytracer.matrices.Matrix):
+class Identity(matrices.Matrix):
 
     def __init__(self, size):
         super().__init__(size, size)

@@ -1,13 +1,19 @@
 import numbers
 
-import raytracer.tuples
+import tuples
 
-class Color(raytracer.tuples.Tuple):
+class Color(tuples.Tuple):
     """This class represents a color.  It is initialized with
     red, green, and blue components
     """
 
     def __init__(self, red, green, blue):
+
+        # These are here so that mypy can figure out the attributres exist
+        self.red = 0
+        self.green = 0
+        self.blue = 0
+
         super().__init__(["red", "green", "blue"], red, green, blue)
 
     def __repr__(self):

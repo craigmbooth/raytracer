@@ -1,6 +1,6 @@
-import raytracer.tuples
+import tuples
 
-class Point(raytracer.tuples.Tuple):
+class Point(tuples.Tuple):
     """This class represents a point in space.  It is initialized with
     x, y, and z coordinates and then in this class we add a fourth component,
     w, which is 1 for a point

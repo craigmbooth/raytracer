@@ -1,5 +1,5 @@
-import raytracer.points
-import raytracer.colors
+import points
+import colors
 
 class Light:
     pass
@@ -10,8 +10,8 @@ class PointLight(Light):
     intensity
     """
 
-    def __init__(self, position: raytracer.points.Point,
-                 intensity: raytracer.colors.Color):
+    def __init__(self, position: points.Point,
+                 intensity: colors.Color):
 
         self.position = position
         self.intensity = intensity

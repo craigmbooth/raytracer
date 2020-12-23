@@ -1,6 +1,6 @@
 import math
 
-import raytracer.exceptions
+import exceptions
 
 class Tuple:
     """ This class represents a generic tuple.

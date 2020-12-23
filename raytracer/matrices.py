@@ -1,8 +1,8 @@
 import copy
 import numbers
 
-import raytracer.exceptions
-import raytracer.tuples
+import exceptions
+import tuples
 
 class Matrix:
     """Class represents a matrix of size rows x columns"""
@@ -53,7 +53,7 @@ class Matrix:
 
         if isinstance(other, Matrix):
             if self.rows != other.rows or self.columns != other.columns:
-                raise raytracer.exceptions.IncompatibleLengthError
+                raise exceptions.IncompatibleLengthError
 
             m = Matrix(self.rows, self.columns)
 
@@ -65,10 +65,10 @@ class Matrix:
                     m.set(i, j, sum([x*y for x, y in zip(my_row, other_column)]))
             return m
 
-        elif isinstance(other, raytracer.tuples.Tuple):
+        elif isinstance(other, tuples.Tuple):
 
             zeros = [0] * len(other.fillables)
-            r = raytracer.tuples.Tuple(other.fillables, *zeros)
+            r = tuples.Tuple(other.fillables, *zeros)
 
             for i in range(self.rows):
                 my_row = self.get_row(i)
@@ -150,7 +150,7 @@ class Matrix:
 
         determinant = self.det()
         if determinant == 0:
-            raise raytracer.exceptions.CannotInvertMatrixError
+            raise exceptions.CannotInvertMatrixError
 
 
         m = Matrix(self.rows, self.columns)
