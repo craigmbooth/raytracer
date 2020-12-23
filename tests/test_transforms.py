@@ -196,9 +196,9 @@ class TestChainedTransformations(unittest.TestCase):
         """Test we can chain together transforms with the apply function"""
         point = raytracer.points.Point(1, 0, 1)
 
-        p2 = (point.apply(raytracer.transforms.RotateX(math.pi/2))
-                   .apply(raytracer.transforms.Scale(5, 5, 5))
-                   .apply(raytracer.transforms.Translate(10, 5, 7)))
+        p2 = point.apply(raytracer.transforms.RotateX(math.pi/2)) \
+                  .apply(raytracer.transforms.Scale(5, 5, 5)) \
+                  .apply(raytracer.transforms.Translate(10, 5, 7))
 
         self.assertEqual(p2, raytracer.points.Point(15, 0, 7))
 

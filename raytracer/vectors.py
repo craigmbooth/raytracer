@@ -12,13 +12,6 @@ class Vector(raytracer.tuples.Tuple):
     def __repr__(self):
         return f"Vector [{self.x}, {self.y}, {self.z}]"
 
-    def dot(self, other):
-        """Calculates the dot product between two vectors.  Note that this
-        calculation only makes sense on vectors, so lives on the subclass and
-        also makes direct use of the fillable names
-        """
-
-        return sum([self.x * other.x, self.y * other.y, self.z * other.z])
 
     def cross(self, other):
         """Calculates the cross product between two tuples.  Note that this

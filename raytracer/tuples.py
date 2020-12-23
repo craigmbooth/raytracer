@@ -108,6 +108,12 @@ class Tuple:
 
         return Tuple(self.fillables, *output_fillables)
 
+    def dot(self, other):
+        """Calculates the dot product between two vectors.
+        """
+        return sum([getattr(self, x) * getattr(other, x)
+                    for x in self.fillables])
+
     def apply(self, M):
         """Does M * self and returns the resultant point"""
         return M * self
