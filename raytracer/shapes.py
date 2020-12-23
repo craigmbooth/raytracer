@@ -15,7 +15,7 @@ class Shape:
     def __eq__(self, other):
         return self.id == other.id
 
-    def set_transform(M):
+    def set_transform(self, M):
         """Sets the shape's transform to the matrix M"""
         self.transform = M
 
