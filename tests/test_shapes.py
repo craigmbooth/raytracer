@@ -4,7 +4,7 @@ import raytracer.rays
 import raytracer.shapes
 import raytracer.points
 import raytracer.vectors
-
+import raytracer.transforms
 class TestSphere(unittest.TestCase):
 
 
@@ -74,6 +74,18 @@ class TestSphere(unittest.TestCase):
         self.assertEqual(result[0].shape, s)
         self.assertEqual(result[1].shape, s)
 
+    def test_default_transform(self):
+        """Test that we get the identity matrix as the default transform"""
+
+        s = raytracer.shapes.Sphere()
+        self.assertEqual(s.transform, raytracer.transforms.Identity(4))
+
+    def test_changed_transform(self):
+        """Test that we can change the transform on a shape"""
+
+        s = raytracer.shapes.Sphere()
+        s.set_transform(raytracer.transforms.Translate(6, 7, 8))
+        self.assertEqual(s.transform, raytracer.transforms.Translate(6, 7, 8))
 
 if __name__ == "__main__":
     unittest.main()

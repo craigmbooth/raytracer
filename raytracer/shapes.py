@@ -4,14 +4,20 @@ import uuid
 import raytracer.intersections
 import raytracer.rays
 import raytracer.points
+import raytracer.transforms
 
 class Shape:
 
     def __init__(self):
         self.id = uuid.uuid4()
+        self.transform = raytracer.transforms.Identity(4)
 
     def __eq__(self, other):
         return self.id == other.id
+
+    def set_transform(M):
+        """Sets the shape's transform to the matrix M"""
+        self.transform = M
 
 
 class Sphere(Shape):
