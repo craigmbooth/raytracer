@@ -2,7 +2,14 @@ import points
 import colors
 
 class Light:
-    pass
+
+    def __init__(self, position: points.Point,
+                 intensity: colors.Color) -> None:
+
+        self.position = position
+        self.intensity = intensity
+
+
 
 
 class PointLight(Light):
@@ -11,7 +18,6 @@ class PointLight(Light):
     """
 
     def __init__(self, position: points.Point,
-                 intensity: colors.Color):
+                 intensity: colors.Color) -> None:
 
-        self.position = position
-        self.intensity = intensity
+        super().__init__(position, intensity)

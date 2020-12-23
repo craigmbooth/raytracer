@@ -1,5 +1,6 @@
 import copy
 import numbers
+from typing import Union, List
 
 import exceptions
 import tuples
@@ -7,14 +8,14 @@ import tuples
 class Matrix:
     """Class represents a matrix of size rows x columns"""
 
-    def __init__(self, rows, columns):
+    def __init__(self, rows: int, columns: int) -> None:
 
         self.rows = rows
         self.columns = columns
-        self.values = [[0] * columns for
+        self.values = [[0.0] * columns for
                            _ in range(rows)]
 
-    def __repr__(self):
+    def __repr__(self) -> str:
 
         outstr = f"Matrix (rows={self.rows} columns={self.columns})\n"
         for r in range(self.rows):
@@ -31,8 +32,12 @@ class Matrix:
         return outstr
 
     @staticmethod
-    def _close(x, y, epsilon=1e-3):
+    def _close(x: Union[float, int], y: Union[float, int],
+               epsilon: float=1e-3) -> bool:
         """Utility function, returns True if two numbers are close, else false
+
+        :param epsilon: If the absolute value of the differences of all
+            attribues is less than epsilon, the two numbers are close
         """
         return True if abs(x-y) < epsilon else False
 
@@ -48,7 +53,7 @@ class Matrix:
         else:
             return True
 
-    def __mul__(self, other):
+    def __mul__(self, other) -> Union[Matrix, tuples.Tuple]:
         """Perform matrix multiplication"""
 
         if isinstance(other, Matrix):
@@ -72,20 +77,23 @@ class Matrix:
 
             for i in range(self.rows):
                 my_row = self.get_row(i)
-                result = sum([my_row[j]*other.values()[j] for j in range(self.columns)])
+                result = sum([my_row[j]*other.values()[j]
+                              for j in range(self.columns)])
                 setattr(r, other.fillables[i], result)
             return r
+        else:
+            raise ValueError
 
-    def set(self, x: int, y: int, value: numbers.Number) -> None:
+    def set(self, x: int, y: int, value: Union[int, float]) -> None:
         self.values[x][y] = value
 
-    def get(self, x: int, y: int) -> numbers.Number:
+    def get(self, x: int, y: int) -> Union[int, float]:
         return self.values[x][y]
 
-    def get_row(self, row: int) -> list:
+    def get_row(self, row: int) -> List[Union[int, float]]:
         return self.values[row]
 
-    def get_col(self, col: int) -> list:
+    def get_col(self, col: int) -> List[Union[int, float]]:
         return [r[col] for r in self.values]
 
     def set_row(self, row: int, values: list) -> None:
@@ -96,45 +104,45 @@ class Matrix:
         for i in range(len(values)):
             self.values[i][col] = values[i]
 
-    def transpose(self):
+    def transpose(self) -> Matrix:
         m = Matrix(self.columns, self.rows)
         for i in range(self.rows):
             m.set_col(i, self.get_row(i))
         return m
 
-    def submatrix(self, row, column):
+    def submatrix(self, row: int, column: int) -> Matrix:
         """Return a copy of the matrix with the rows and column specified in the
         arguments removed
         """
 
         m = copy.deepcopy(self)
         _ = m.values.pop(row)
-        for row in m.values:
-            row.pop(column)
+        for row_values in m.values:
+            row_values.pop(column)
 
         m.columns -= 1
         m.rows -= 1
         return m
 
-    def det(self):
+    def det(self) -> Union[int, float]:
         """Calculates the determinant of the matrix"""
 
         if self.columns == 2 and self.rows == 2:
             return self.get(0, 0) * self.get(1, 1) - self.get(1, 0) * self.get(0, 1)
         else:
-            det = 0
+            det = 0.0
             for i, value in enumerate(self.get_row(0)):
                 det += self.get(0, i) * self.cofactor(0, i)
             return det
 
 
-    def minor(self, row, column):
+    def minor(self, row: int, column: int) -> Union[int, float]:
         """Calculate the minor of the matrix at row and column, which is
         calculated as the determinant of the submatrix
         """
         return self.submatrix(row, column).det()
 
-    def cofactor(self, row, column):
+    def cofactor(self, row: int, column: int) -> Union[int, float]:
         """Calculate the cofactor of the matrix at row and column.  The cofactor
         is the minor, potentially with its sign changed, depending upon its
         location in the matrix
@@ -143,7 +151,7 @@ class Matrix:
         pre = 1 if (row + column) % 2 == 0 else -1
         return pre * self.minor(row, column)
 
-    def inverse(self):
+    def inverse(self) -> Matrix:
         """Calculate the inverse of a matrix, or raise CannotInvertMatrix if
         there is no inverse
         """
