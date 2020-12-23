@@ -53,7 +53,7 @@ class Matrix:
         else:
             return True
 
-    def __mul__(self, other) -> Union[Matrix, tuples.Tuple]:
+    def __mul__(self, other):
         """Perform matrix multiplication"""
 
         if isinstance(other, Matrix):
@@ -104,13 +104,13 @@ class Matrix:
         for i in range(len(values)):
             self.values[i][col] = values[i]
 
-    def transpose(self) -> Matrix:
+    def transpose(self):
         m = Matrix(self.columns, self.rows)
         for i in range(self.rows):
             m.set_col(i, self.get_row(i))
         return m
 
-    def submatrix(self, row: int, column: int) -> Matrix:
+    def submatrix(self, row: int, column: int):
         """Return a copy of the matrix with the rows and column specified in the
         arguments removed
         """
@@ -151,7 +151,7 @@ class Matrix:
         pre = 1 if (row + column) % 2 == 0 else -1
         return pre * self.minor(row, column)
 
-    def inverse(self) -> Matrix:
+    def inverse(self):
         """Calculate the inverse of a matrix, or raise CannotInvertMatrix if
         there is no inverse
         """

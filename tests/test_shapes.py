@@ -18,10 +18,10 @@ class TestSphere(unittest.TestCase):
 
         result = s.intersect(r)
 
-        self.assertEqual(result[0].t, 4)
-        self.assertEqual(result[1].t, 6)
-        self.assertEqual(result[0].shape, s)
-        self.assertEqual(result[1].shape, s)
+        self.assertEqual(result.intersections[0].t, 4)
+        self.assertEqual(result.intersections[1].t, 6)
+        self.assertEqual(result.intersections[0].shape, s)
+        self.assertEqual(result.intersections[1].shape, s)
 
     def test_intersection_standard__glance(self):
         """Test we can identify what points a ray intersects with a sphere when
@@ -33,10 +33,10 @@ class TestSphere(unittest.TestCase):
 
         result = s.intersect(r)
 
-        self.assertEqual(result[0].t, 5)
-        self.assertEqual(result[1].t, 5)
-        self.assertEqual(result[0].shape, s)
-        self.assertEqual(result[1].shape, s)
+        self.assertEqual(result.intersections[0].t, 5)
+        self.assertEqual(result.intersections[1].t, 5)
+        self.assertEqual(result.intersections[0].shape, s)
+        self.assertEqual(result.intersections[1].shape, s)
 
 
     def test_intersection_miss(self):
@@ -46,7 +46,7 @@ class TestSphere(unittest.TestCase):
         r = rays.Ray(points.Point(0, 2, -5),
                                vectors.Vector(0, 0, 1))
 
-        self.assertEqual(s.intersect(r), [])
+        self.assertEqual(s.intersect(r).intersections, [])
 
     def test_intersection_inside(self):
         """Test we handle the case where the ray starts inside the sphere"""
@@ -57,10 +57,10 @@ class TestSphere(unittest.TestCase):
 
         result = s.intersect(r)
 
-        self.assertEqual(result[0].t, -1)
-        self.assertEqual(result[1].t, 1)
-        self.assertEqual(result[0].shape, s)
-        self.assertEqual(result[1].shape, s)
+        self.assertEqual(result.intersections[0].t, -1)
+        self.assertEqual(result.intersections[1].t, 1)
+        self.assertEqual(result.intersections[0].shape, s)
+        self.assertEqual(result.intersections[1].shape, s)
 
     def test_intersection_behind(self):
         """Test we handle the case where the ray starts inside the sphere"""
@@ -71,10 +71,10 @@ class TestSphere(unittest.TestCase):
 
         result = s.intersect(r)
 
-        self.assertEqual(result[0].t, -6)
-        self.assertEqual(result[1].t, -4)
-        self.assertEqual(result[0].shape, s)
-        self.assertEqual(result[1].shape, s)
+        self.assertEqual(result.intersections[0].t, -6)
+        self.assertEqual(result.intersections[1].t, -4)
+        self.assertEqual(result.intersections[0].shape, s)
+        self.assertEqual(result.intersections[1].shape, s)
 
     def test_default_transform(self):
         """Test that we get the identity matrix as the default transform"""
@@ -101,10 +101,10 @@ class TestSphere(unittest.TestCase):
                                vectors.Vector(0, 0, 1))
 
         result = s.intersect(r)
-        self.assertEqual(result[0].t, 3)
-        self.assertEqual(result[1].t, 7)
-        self.assertEqual(result[0].shape, s)
-        self.assertEqual(result[1].shape, s)
+        self.assertEqual(result.intersections[0].t, 3)
+        self.assertEqual(result.intersections[1].t, 7)
+        self.assertEqual(result.intersections[0].shape, s)
+        self.assertEqual(result.intersections[1].shape, s)
 
     def test_intersections_with_transformed_ray__translation(self):
         """Test we get the correct intersections after adding a translation
@@ -118,7 +118,7 @@ class TestSphere(unittest.TestCase):
                                vectors.Vector(0, 0, 1))
 
         result = s.intersect(r)
-        self.assertTrue(len(result) == 0)
+        self.assertTrue(len(result.intersections) == 0)
 
     def test_normal_at__non_transformed(self):
         """Test we can calculate normal vectors on the unit sphere"""
