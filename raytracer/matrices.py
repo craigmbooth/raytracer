@@ -105,10 +105,14 @@ class Matrix:
             self.values[i][col] = values[i]
 
     def transpose(self):
-        m = Matrix(self.columns, self.rows)
+        """Return the matrix, transposed (rows become columns).  No edits
+        in-place
+        """
+
+        Mat = Matrix(self.columns, self.rows)
         for i in range(self.rows):
-            m.set_col(i, self.get_row(i))
-        return m
+            Mat.set_col(i, self.get_row(i))
+        return Mat
 
     def submatrix(self, row: int, column: int):
         """Return a copy of the matrix with the rows and column specified in the
@@ -129,11 +133,11 @@ class Matrix:
 
         if self.columns == 2 and self.rows == 2:
             return self.get(0, 0) * self.get(1, 1) - self.get(1, 0) * self.get(0, 1)
-        else:
-            det = 0.0
-            for i, value in enumerate(self.get_row(0)):
-                det += self.get(0, i) * self.cofactor(0, i)
-            return det
+
+        det = 0.0
+        for i, value in enumerate(self.get_row(0)):
+            det += self.get(0, i) * self.cofactor(0, i)
+        return det
 
 
     def minor(self, row: int, column: int) -> Union[int, float]:

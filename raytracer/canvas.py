@@ -1,12 +1,18 @@
-import colors
+"""File describes the "canvas" object, which is a 2d canvas of pixels, which.
+Also contains utility  functions to write the canvas to disk
+"""
 
-from numbers import Number
 from typing import Union
 
+import colors
+
+# The maximum number of characters in a line of a ppm file
 MAX_LINE_LEN = 70
 
 class Canvas:
-
+    """At its heart, the canvas is a 2d array where you can write a color to
+    each pixel.  The canvas also handles dumping this structure to an image.
+    """
     def __init__(self, width: int, height: int) -> None:
 
         self.width = width
@@ -18,16 +24,19 @@ class Canvas:
     def __repr__(self) -> str:
         return f"Canvas [w={self.width}, h={self.height}]"
 
-    def set(self, x: int, y: int, color: colors.Color) -> None:
-        self.canvas[x][y] = color
+    def set(self, x_coord: int, y_coord: int, color: colors.Color) -> None:
+        """Set the pixel at (x_coord, ycoord) to the color in `color`"""
+        self.canvas[x_coord][y_coord] = color
 
-    def get(self, x: int, y: int) -> colors.Color:
-        return self.canvas[x][y]
+    def get(self, x_coord: int, y_coord: int) -> colors.Color:
+        """Retrieve the value of the pixel at `x_coord`, `y_coord`"""
+        return self.canvas[x_coord][y_coord]
 
     @staticmethod
-    def clamp(minval: Union[int, float], x: Union[int, float],
+    def clamp(minval: Union[int, float], val: Union[int, float],
               maxval: Union[int, float]) -> float:
-        return min(max(minval, x), maxval)
+        """Return a value clamped between `minval` and `maxval`"""
+        return min(max(minval, val), maxval)
 
     def _get_ppm_file_content(self) -> str:
         """Convert the canvas into a string containing the PPM file content"""
@@ -38,11 +47,11 @@ class Canvas:
         for i in range(self.height):
             row_string = ""
             for j in range(self.width):
-                r = round(self.clamp(0, self.canvas[j][i].red*255, 255))
-                g = round(self.clamp(0, self.canvas[j][i].green*255, 255))
-                b = round(self.clamp(0, self.canvas[j][i].blue*255, 255))
+                red = round(self.clamp(0, self.canvas[j][i].red*255, 255))
+                green = round(self.clamp(0, self.canvas[j][i].green*255, 255))
+                blue = round(self.clamp(0, self.canvas[j][i].blue*255, 255))
 
-                row_string += f"{r} {g} {b} "
+                row_string += f"{red} {green} {blue} "
 
             split_row_string = ""
             len_current_row = 0
@@ -65,5 +74,5 @@ class Canvas:
         """Write the canvas out to a file with the given filename"""
 
         content = self._get_ppm_file_content()
-        with open(filename, "w") as f:
-            f.write(content)
+        with open(filename, "w") as file_handle:
+            file_handle.write(content)
