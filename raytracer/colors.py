@@ -1,3 +1,7 @@
+"""Module represents a color, which is essentially a three-tuple of r, g, b
+values with some utility functions attached
+"""
+
 import numbers
 
 import tuples
@@ -7,7 +11,7 @@ class Color(tuples.Tuple):
     red, green, and blue components
     """
 
-    def __init__(self, red, green, blue):
+    def __init__(self, red: float, green: float, blue: float) -> None:
 
         # These are here so that mypy can figure out the attributres exist
         self.red = 0
@@ -16,13 +20,13 @@ class Color(tuples.Tuple):
 
         super().__init__(["red", "green", "blue"], red, green, blue)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Color [r={self.red}, g={self.green}, b={self.blue}]"
 
     def __mul__(self, other):
 
         if isinstance(other, numbers.Number):
-            # If the other item is a number, use the paren't scalar
+            # If the other item is a number, use the parent scalar
             # multiplication
             return super().__mul__(other)
 

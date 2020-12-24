@@ -16,6 +16,10 @@ mypy raytracer
 # ----------------------------
 # Check code quality threshold
 # ----------------------------
-pylint raytracer --fail-under 6.2
 
-# Note that pylint doesn't really dispay an error, it just does it with an error code.  Need to clean up printing here, and show error messages
+# n.b. the threshold here was set to the code quality on the first commit of
+# this code (6.11).  Going forward, the number has to keep going up, and every
+# time it passes another 0.1, I move this parameter
+pylint raytracer --fail-under 6.4
+
+echo -e "\e[32mCompleted successfully\e[39m"

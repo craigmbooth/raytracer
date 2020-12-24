@@ -1,5 +1,4 @@
 import copy
-import numbers
 from typing import Union, List
 
 import exceptions
@@ -39,7 +38,7 @@ class Matrix:
         :param epsilon: If the absolute value of the differences of all
             attribues is less than epsilon, the two numbers are close
         """
-        return True if abs(x-y) < epsilon else False
+        return abs(x-y) < epsilon
 
     def __eq__(self, other):
 
