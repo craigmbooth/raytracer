@@ -1,3 +1,4 @@
+"""Module contains all objects that represent basic matrix types"""
 import copy
 from typing import Union, List
 
@@ -17,17 +18,18 @@ class Matrix:
     def __repr__(self) -> str:
 
         outstr = f"Matrix (rows={self.rows} columns={self.columns})\n"
-        for r in range(self.rows):
-            if r == 0:
+        for row in range(self.rows):
+            if row == 0:
                 prefix = "[[ "
                 postfix = ""
-            elif r == self.rows - 1:
+            elif row == self.rows - 1:
                 prefix = "   "
                 postfix = " ]]"
             else:
                 prefix = "   "
                 postfix = ""
-            outstr += prefix + "\t".join([str(e) for e in self.get_row(r)])+postfix+"\n"
+            outstr += prefix + "\t".join([str(e)
+                for e in self.get_row(row)])+postfix+"\n"
         return outstr
 
     @staticmethod
@@ -49,8 +51,7 @@ class Matrix:
             for j in range(other.rows):
                 if not self._close(self.values[i][j], other.values[i][j]):
                     return False
-        else:
-            return True
+        return True
 
     def __mul__(self, other):
         """Perform matrix multiplication"""
@@ -84,6 +85,7 @@ class Matrix:
             raise ValueError
 
     def set(self, x: int, y: int, value: Union[int, float]) -> None:
+        """Set the element at x, y to the given value"""
         self.values[x][y] = value
 
     def get(self, x: int, y: int) -> Union[int, float]:
