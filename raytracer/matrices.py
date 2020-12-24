@@ -60,15 +60,15 @@ class Matrix:
             if self.rows != other.rows or self.columns != other.columns:
                 raise exceptions.IncompatibleLengthError
 
-            m = Matrix(self.rows, self.columns)
+            M = Matrix(self.rows, self.columns)
 
             for i in range(self.rows):
                 for j in range(self.columns):
                     my_row = self.get_row(i)
                     other_column = other.get_col(j)
 
-                    m.set(i, j, sum([x*y for x, y in zip(my_row, other_column)]))
-            return m
+                    M.set(i, j, sum([x*y for x, y in zip(my_row, other_column)]))
+            return M
 
         elif isinstance(other, tuples.Tuple):
 
@@ -110,24 +110,24 @@ class Matrix:
         in-place
         """
 
-        Mat = Matrix(self.columns, self.rows)
+        M = Matrix(self.columns, self.rows)
         for i in range(self.rows):
-            Mat.set_col(i, self.get_row(i))
-        return Mat
+            M.set_col(i, self.get_row(i))
+        return M
 
     def submatrix(self, row: int, column: int):
         """Return a copy of the matrix with the rows and column specified in the
         arguments removed
         """
 
-        m = copy.deepcopy(self)
-        _ = m.values.pop(row)
-        for row_values in m.values:
+        M = copy.deepcopy(self)
+        _ = M.values.pop(row)
+        for row_values in M.values:
             row_values.pop(column)
 
-        m.columns -= 1
-        m.rows -= 1
-        return m
+        M.columns -= 1
+        M.rows -= 1
+        return M
 
     def det(self) -> Union[int, float]:
         """Calculates the determinant of the matrix"""

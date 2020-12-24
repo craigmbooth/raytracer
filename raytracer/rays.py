@@ -19,7 +19,7 @@ class Ray:
         """Return the position of the ray at a given time, time"""
         return self.origin + self.direction * time
 
-    def transform(self, Mat):
+    def transform(self, M):
         """Transform the ray with the matrix"""
 
-        return Ray(Mat * self.origin, Mat * self.direction)
+        return Ray(M * self.origin, M * self.direction)

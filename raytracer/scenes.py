@@ -2,7 +2,9 @@
 
 from typing import List
 
+import intersections
 import lights
+import rays
 import shapes
 
 class Scene:
@@ -22,3 +24,17 @@ class Scene:
             self.lights = []
         else:
             self.lights = lights
+
+
+    def intersect(self, r: rays.Ray) -> intersections.Intersections:
+        """Intersect the ray r with all the objects in the scene and return
+        intersections sotred by t value
+        """
+
+        for i, shape in enumerate(self.objects):
+            if i == 0:
+                all_intersections = shape.intersect(r)
+            else:
+                all_intersections += shape.intersect(r)
+
+        return all_intersections

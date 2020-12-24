@@ -11,13 +11,23 @@ class Intersection:
 
 
 class Intersections:
+    """Class represents a list of intersection objects, should always
+    return sorted by t value
+    """
 
     def __init__(self, *args):
         self.intersections = list(args)
+        self.intersections.sort(key=lambda x: x.t)
 
     def add(self, intersection):
-        intersections.append(intersection)
+        self.intersections.append(intersection)
+        self.intersections.sort(key=lambda x: x.t)
 
+    def __add__(self, other):
+        self_intersections = self.intersections
+        other_intersections = other.intersections
+        self_intersections.extend(other_intersections)
+        return Intersections(*self_intersections)
 
     def hit(self):
         """Find the lowest non-negative value of t"""

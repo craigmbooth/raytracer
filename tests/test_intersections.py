@@ -20,7 +20,7 @@ class TestIntersections(unittest.TestCase):
         self.assertEqual(i2.t, -3.5)
 
         i = intersections.Intersections(i1, i2)
-        self.assertEqual(i.intersections, [i1, i2])
+        self.assertEqual(i.intersections, [i2, i1])
 
 
     def test_hits__positive(self):
