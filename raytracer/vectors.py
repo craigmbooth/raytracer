@@ -1,3 +1,5 @@
+"""This module contains an implementation of a simple Vector class"""
+
 import tuples
 
 class Vector(tuples.Tuple):
@@ -7,6 +9,13 @@ class Vector(tuples.Tuple):
     """
 
     def __init__(self, x, y, z):
+
+        # Initialize and name here so mypy can find attributes
+        self.x = 0               # pylint: disable=C0103
+        self.y = 0               # pylint: disable=C0103
+        self.z = 0               # pylint: disable=C0103
+        self.w = 0               # pylint: disable=C0103
+
         super().__init__(["x", "y", "z", "w"], x, y, z, 0)
 
     def __repr__(self):
