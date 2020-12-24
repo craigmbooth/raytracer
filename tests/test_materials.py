@@ -1,3 +1,4 @@
+import math
 import unittest
 
 import colors
@@ -39,6 +40,40 @@ class TestMaterials(unittest.TestCase):
 
         result = m.lighting(light, p, eyev, normalv)
         self.assertEqual(result, colors.Color(1.9, 1.9, 1.9))
+
+        eyev = vectors.Vector(0, math.sqrt(2)/2, -math.sqrt(2)/2)
+        normalv = vectors.Vector(0, 0, -1)
+        light = lights.PointLight(
+            points.Point(0, 0, -10),
+            colors.Color(1, 1, 1))
+        result = m.lighting(light, p, eyev, normalv)
+        self.assertEqual(result, colors.Color(1.0, 1.0, 1.0))
+
+        eyev = vectors.Vector(0, 0, -1)
+        normalv = vectors.Vector(0, 0, -1)
+        light = lights.PointLight(
+            points.Point(0, 10, -10),
+            colors.Color(1, 1, 1))
+        result = m.lighting(light, p, eyev, normalv)
+        self.assertEqual(result, colors.Color(0.7364, 0.7364, 0.7364))
+
+
+        eyev = vectors.Vector(0, -math.sqrt(2)/2, -math.sqrt(2)/2)
+        normalv = vectors.Vector(0, 0, -1)
+        light = lights.PointLight(
+            points.Point(0, 10, -10),
+            colors.Color(1, 1, 1))
+        result = m.lighting(light, p, eyev, normalv)
+        self.assertEqual(result, colors.Color(1.6364, 1.6364, 1.6364))
+
+        # Light behind the object, its color should be the ambient value
+        eyev = vectors.Vector(0, 0, -1)
+        normalv = vectors.Vector(0, 0, -1)
+        light = lights.PointLight(
+            points.Point(0, 0, 10),
+            colors.Color(1, 1, 1))
+        result = m.lighting(light, p, eyev, normalv)
+        self.assertEqual(result, colors.Color(0.1, 0.1, 0.1))
 
 
 

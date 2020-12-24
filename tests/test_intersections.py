@@ -1,8 +1,10 @@
 import unittest
 
 import intersections
+import rays
+import points
 import shapes
-
+import vectors
 
 class TestIntersections(unittest.TestCase):
 
@@ -69,6 +71,39 @@ class TestIntersections(unittest.TestCase):
         isections = intersections.Intersections(i1, i2, i3, i4, i5)
 
         self.assertEqual(isections.hit(), i4)
+
+    def test_precompute__outside(self):
+        """Test that we can precompute vectors for an intersection and ray when
+        outside of a shape"""
+
+        r = rays.Ray(points.Point(0, 0, -5), vectors.Vector(0, 0, 1))
+        s = shapes.Sphere()
+        i = intersections.Intersection(s, 4)
+
+        computations = i.precompute(r)
+
+        self.assertEqual(computations.t, 4)
+        self.assertEqual(computations.point, points.Point(0, 0, -1))
+        self.assertEqual(computations.eyev, vectors.Vector(0, 0, -1))
+        self.assertEqual(computations.normalv, vectors.Vector(0, 0, -1))
+        self.assertFalse(computations.inside)
+
+    def test_precompute__inside(self):
+        """Test that we can precompute vectors for an intersection and ray when
+        inside of a shape"""
+
+        r = rays.Ray(points.Point(0, 0, 0), vectors.Vector(0, 0, 1))
+        s = shapes.Sphere()
+        i = intersections.Intersection(s, 1)
+
+        computations = i.precompute(r)
+
+        self.assertEqual(computations.t, 1)
+        self.assertEqual(computations.point, points.Point(0, 0, 1))
+        self.assertEqual(computations.eyev, vectors.Vector(0, 0, -1))
+        self.assertEqual(computations.normalv, vectors.Vector(0, 0, -1))
+        self.assertTrue(computations.inside)
+
 
 if __name__ == "__main__":
     unittest.main()

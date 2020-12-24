@@ -70,7 +70,7 @@ class Matrix:
                     M.set(i, j, sum([x*y for x, y in zip(my_row, other_column)]))
             return M
 
-        elif isinstance(other, tuples.Tuple):
+        if isinstance(other, tuples.Tuple):
 
             zeros = [0] * len(other.fillables)
             r = tuples.Tuple(other.fillables, *zeros)
@@ -81,28 +81,38 @@ class Matrix:
                               for j in range(self.columns)])
                 setattr(r, other.fillables[i], result)
             return r
-        else:
-            raise ValueError
+
+        # If we get down here it wasn't any type we can multiply with
+        raise ValueError
 
     def set(self, x: int, y: int, value: Union[int, float]) -> None:
         """Set the element at x, y to the given value"""
         self.values[x][y] = value
 
     def get(self, x: int, y: int) -> Union[int, float]:
+        """Return the value of the matrix as indices x, y"""
         return self.values[x][y]
 
     def get_row(self, row: int) -> List[Union[int, float]]:
+        """Return the values of the matrix at row `row`"""
         return self.values[row]
 
     def get_col(self, col: int) -> List[Union[int, float]]:
+        """Return the values of the matrix at column `col`"""
         return [r[col] for r in self.values]
 
     def set_row(self, row: int, values: list) -> None:
-        for i in range(len(values)):
+        """Given a row index and a list of values, set the row at the index to
+        the values
+        """
+        for i, _ in enumerate(values):
             self.values[row][i] = values[i]
 
     def set_col(self, col: int, values: list) -> None:
-        for i in range(len(values)):
+        """Given a column index and a list of values, set the column at the
+        index to the values
+        """
+        for i, _ in enumerate(values):
             self.values[i][col] = values[i]
 
     def transpose(self):
@@ -136,7 +146,7 @@ class Matrix:
             return self.get(0, 0) * self.get(1, 1) - self.get(1, 0) * self.get(0, 1)
 
         det = 0.0
-        for i, value in enumerate(self.get_row(0)):
+        for i, _ in enumerate(self.get_row(0)):
             det += self.get(0, i) * self.cofactor(0, i)
         return det
 
@@ -166,13 +176,13 @@ class Matrix:
             raise exceptions.CannotInvertMatrixError
 
 
-        m = Matrix(self.rows, self.columns)
+        M = Matrix(self.rows, self.columns)
 
         for row in range(self.rows):
             for col in range(self.columns):
-                c = self.cofactor(row, col)
+                cofactor = self.cofactor(row, col)
 
                 # Note we have swapped row and col here, which takes care of a
                 # transpose under the hood
-                m.set(col, row, c / determinant)
-        return m
+                M.set(col, row, cofactor / determinant)
+        return M

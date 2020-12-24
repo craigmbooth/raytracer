@@ -1,5 +1,27 @@
+import rays
+import shapes
+
+class Computations:
+    """Class holds precomputed values for an intersection"""
+    def __init__(self, intersection, ray: rays.Ray):
+
+        self.t = intersection.t
+        self.object = intersection.shape
+
+        self.point = ray.position(self.t)
+        self.eyev = -ray.direction
+        self.normalv = intersection.shape.normal_at(self.point)
+
+        self.inside = False
+        if self.normalv.dot(self.eyev) < 0:
+            # If the dot product of the eye vector and normal is negative, they
+            # are pointing away from each other, which means you're inside of
+            # the object.
+            self.inside = True
+            self.normalv = - self.normalv
+
 class Intersection:
-    def __init__(self, shape, t):
+    def __init__(self, shape: shapes.Shape, t: float):
         self.shape = shape
         self.t = t
 
@@ -8,6 +30,10 @@ class Intersection:
 
     def __repr__(self):
         return f"Intersection at t={self.t} with {self.shape}"
+
+
+    def precompute(self, r: rays.Ray) -> Computations:
+        return Computations(self, r)
 
 
 class Intersections:

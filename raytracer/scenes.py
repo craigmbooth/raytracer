@@ -2,6 +2,7 @@
 
 from typing import List
 
+import colors
 import intersections
 import lights
 import rays
@@ -38,3 +39,14 @@ class Scene:
                 all_intersections += shape.intersect(r)
 
         return all_intersections
+
+
+    def shade_hit(self,
+                  computations: intersections.Computations) -> colors.Color:
+        """Given some pre-calculated values about a hit, calculate its color"""
+
+        color = colors.Color(0, 0, 0)
+        for light in self.lights:
+            color += computations.object.material.lighting(light,
+                    computations.point, computations.eyev, computations.normalv)
+        return color
