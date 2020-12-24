@@ -1,9 +1,15 @@
-import math
-import numbers
+"""Module contains matrices that are used to perform affine transformations on
+points
+"""
 
-import exceptions, matrices, tuples
+import math
+
+import matrices
 
 class Identity(matrices.Matrix):
+    """The identity matrix.  Great for multiplying with things if you want to do
+    work for no reason.
+    """
 
     def __init__(self, size):
         super().__init__(size, size)
@@ -12,6 +18,7 @@ class Identity(matrices.Matrix):
 
 
 class Translate(Identity):
+    """Matrix initialized with x, y, z, and moves a point by that amount"""
 
     def __init__(self, x, y, z):
         """ The translation matrix translates objects by an amount x, y, z.
@@ -29,6 +36,9 @@ class Translate(Identity):
 
 
 class Scale(Identity):
+    """Matrix initialized with x, y, w and scales the point by that factor in
+    each direction
+    """
 
     def __init__(self, x, y, z):
         """ The scaling matrix scales objects by a factor x, y, z along those
@@ -46,6 +56,10 @@ class Scale(Identity):
 
 
 class RotateX(Identity):
+    """Matrix initialized with an angle, and rotates points around the x-axis by
+    that angle
+    """
+
     def __init__(self, r, degrees=False):
         """ Given an angle in radians, rotates the point around the x-axis
         by that amount
@@ -67,6 +81,10 @@ class RotateX(Identity):
 
 
 class RotateY(Identity):
+    """Matrix initialized with an angle, and rotates points around the y-axis by
+    that angle
+    """
+
     def __init__(self, r, degrees=False):
         """ Given an angle in radians, rotates the point around the y-axis
         by that amount
@@ -88,7 +106,11 @@ class RotateY(Identity):
 
 
 class RotateZ(Identity):
-    def __init__(self, r, degrees=False):
+    """Matrix initialized with an angle, and rotates points around the z-axis by
+    that angle
+    """
+
+    def __init__(self, r: float, degrees: bool=False):
         """ Given an angle in radians, rotates the point around the z-axis
         by that amount
 
@@ -115,7 +137,10 @@ class Shear(Identity):
       z_x z_y 1    0
       0   0   0    1 ]
     """
-    def __init__(self, x_y, x_z, y_x, y_z, z_x, z_y):
+    def __init__(self,                                   # pylint: disable=R0913
+                 x_y: float, x_z: float,
+                 y_x: float, y_z: float,
+                 z_x: float, z_y: float):
 
         super().__init__(4)
 
