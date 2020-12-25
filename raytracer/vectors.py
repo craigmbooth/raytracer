@@ -20,14 +20,3 @@ class Vector(tuples.Tuple):
 
     def __repr__(self) -> str:
         return f"Vector [{self.x}, {self.y}, {self.z}]"
-
-
-    def cross(self, other):
-        """Calculates the cross product between two tuples.  Note that this
-        calculation only makes sense on vectors, so lives on the subclass and
-        also makes direct use of the fillable names
-        """
-
-        return Vector(self.y * other.z - self.z * other.y,
-                      self.z * other.x - self.x * other.z,
-                      self.x * other.y - self.y * other.x)

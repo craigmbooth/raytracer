@@ -1,3 +1,4 @@
+import copy
 import unittest
 
 import colors
@@ -17,9 +18,11 @@ class TestScenes(unittest.TestCase):
     def setUp(self):
         """Set up a default scene for quick testing"""
 
+        # Inner sphere size 0.5, centered on the origin
         self.s1 = shapes.Sphere()
         self.s1.set_transform(transforms.Scale(0.5,0.5,0.5))
 
+        # Outer sphere centered on the origin, size 1.0
         self.s2 = shapes.Sphere()
         self.s2.material = materials.Material(
             color=colors.Color(0.8, 1.0, 0.6), diffuse=0.7, specular=0.2)
@@ -95,3 +98,40 @@ class TestScenes(unittest.TestCase):
         color = self.default_scene.shade_hit(computations)
 
         self.assertEqual(color, colors.Color(0.90498, 0.90498, 0.90498))
+
+    def test_color_at(self):
+        """Tests on the color_at function"""
+
+        # The ray points away from the object
+        r = rays.Ray(
+            points.Point(0, 0, -5),
+            vectors.Vector(0, 1, 0)
+            )
+        self.assertEqual(
+            self.default_scene.color_at(r),
+            colors.Color(0, 0, 0)
+            )
+
+        # The ray points at the outer sphere
+        r = rays.Ray(
+            points.Point(0, 0, -5),
+            vectors.Vector(0, 0, 1)
+            )
+        self.assertEqual(
+            self.default_scene.color_at(r),
+            colors.Color(0.38066, 0.47583, 0.2855)
+            )
+
+        # The ray is outside the inner sphere, but inside the outer sphere,
+        # pointing in.  It should return the color of the inner sphere
+        scene = copy.deepcopy(self.default_scene)
+        scene.objects[0].material.ambient = 1
+        scene.objects[1].material.ambient = 1
+        r = rays.Ray(
+            points.Point(0, 0, 0.75),
+            vectors.Vector(0, 0, -1)
+            )
+        self.assertEqual(
+            scene.color_at(r),
+            scene.objects[0].material.color
+            )

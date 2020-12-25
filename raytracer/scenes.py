@@ -50,3 +50,20 @@ class Scene:
             color += computations.object.material.lighting(light,
                     computations.point, computations.eyev, computations.normalv)
         return color
+
+    def color_at(self, ray: rays.Ray) -> colors.Color:
+        """Calculates the color of a ray in the scene"""
+
+        # List out all the surfaces the ray intersects
+        intersections = self.intersect(ray)
+
+        # Find the closest one, in front of the camera (the "hit"):
+        hit = intersections.hit()
+
+        # If there were no hits, return the background color
+        if hit is None:
+            return colors.Color(0, 0, 0)
+
+        # Else, calculate the color of the pixel
+        precomputes = hit.precompute(ray)
+        return self.shade_hit(precomputes)

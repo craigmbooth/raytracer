@@ -204,7 +204,53 @@ class TestChainedTransformations(unittest.TestCase):
         self.assertEqual(p2, points.Point(15, 0, 7))
 
 
+class TestViewTransformation(unittest.TestCase):
+    """Tests on the view transformation"""
 
+    def test_default_view(self):
+        """Test that the view transform for the default view is identity"""
+
+        from_point = points.Point(0, 0, 0)
+        to_point = points.Point(0, 0, -1)
+        up = vectors.Vector(0, 1, 0)
+        result = transforms.ViewTransform(from_point, to_point, up)
+        self.assertEqual(result, transforms.Identity(4))
+
+    def test_rotate_camera(self):
+        """A view transformation matrix looking in the +ve z direction"""
+
+        from_point = points.Point(0, 0, 0)
+        to_point = points.Point(0, 0, 1)
+        up = vectors.Vector(0, 1, 0)
+        result = transforms.ViewTransform(from_point, to_point, up)
+        self.assertEqual(result, transforms.Scale(-1, 1, -1))
+
+
+    def test_move_camera(self):
+        """Test we can move the camera (well... move the world)"""
+        from_point = points.Point(0, 0, 9)
+        to_point = points.Point(0, 0, 0)
+        up = vectors.Vector(0, 1, 0)
+
+        result = transforms.ViewTransform(from_point, to_point, up)
+
+        self.assertEqual(result, transforms.Translate(0, 0, -9))
+
+    def test_arbitrary_view_transform(self):
+        from_point = points.Point(1, 3, 2)
+        to_point = points.Point(4, -2, 8)
+        up = vectors.Vector(1, 1, 0)
+
+        result = transforms.ViewTransform(from_point, to_point, up)
+
+        # pp. 99 of the Ray Tracer Challenge
+        expected = matrices.Matrix(4, 4)
+        expected.set_row(0, [-0.50709, 0.50709, 0.67612, -2.36643])
+        expected.set_row(1, [0.76772, 0.60609, 0.12122, -2.82843])
+        expected.set_row(2, [-0.35857, 0.59761, -0.71714, 0.0])
+        expected.set_row(3, [0, 0, 0, 1])
+
+        self.assertEqual(result, expected)
 
 if __name__ == "__main__":
     unittest.main()

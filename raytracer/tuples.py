@@ -114,6 +114,18 @@ class Tuple:
         return sum([getattr(self, x) * getattr(other, x)
                     for x in self.fillables])
 
+    def cross(self, other):
+        """Calculates the cross product between two tuples.  Note that this
+        calculation only makes sense on vectors, so lives on the subclass and
+        also makes direct use of the fillable names
+        """
+
+        return Tuple(["x", "y", "z", "w"],
+                     self.y * other.z - self.z * other.y,
+                     self.z * other.x - self.x * other.z,
+                     self.x * other.y - self.y * other.x,
+                     0)
+
     def reflect(self, normal):
         """Reflects  self against a surface perpendicular to normal"""
         return self - normal * 2 * self.dot(normal)

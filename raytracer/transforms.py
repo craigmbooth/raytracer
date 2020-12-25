@@ -5,7 +5,8 @@ points
 import math
 
 import matrices
-
+import points
+import vectors
 class Identity(matrices.Matrix):
     """The identity matrix.  Great for multiplying with things if you want to do
     work for no reason.
@@ -150,3 +151,33 @@ class Shear(Identity):
         self.set(1, 2, y_z)
         self.set(2, 0, z_x)
         self.set(2, 1, z_y)
+
+class ViewTransform(matrices.Matrix):
+    """The view transform, given points that specify the camera direction
+    and an up vector, provide the transform that gets the scene into that
+    configuration
+    """
+
+    def __init__(self, from_point: points.Point, to_point: points.Point,
+                 up: vectors.Vector) -> None:
+
+        super().__init__(4, 4)
+
+        forward = (to_point - from_point).normalize()
+        left = forward.cross(up.normalize())
+
+        true_up = left.cross(forward)
+
+        self.set(0, 0, left.x)
+        self.set(0, 1, left.y)
+        self.set(0, 2, left.z)
+        self.set(1, 0, true_up.x)
+        self.set(1, 1, true_up.y)
+        self.set(1, 2, true_up.z)
+        self.set(2, 0, -forward.x)
+        self.set(2, 1, -forward.y)
+        self.set(2, 2, -forward.z)
+        self.set(3, 3, 1)
+
+        temp = self * Translate(-from_point.x, -from_point.y, -from_point.z)
+        self.values = temp.values

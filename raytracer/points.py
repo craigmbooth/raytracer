@@ -7,6 +7,12 @@ class Point(tuples.Tuple):
     """
 
     def __init__(self, x, y, z):
+
+        # Put these here so mypy doesn't get confused
+        self.x = 0
+        self.y = 0
+        self.z = 0
+
         super().__init__(["x", "y", "z", "w"], x, y, z, 1)
 
     def __repr__(self):
