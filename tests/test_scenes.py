@@ -35,7 +35,6 @@ class TestScenes(unittest.TestCase):
         self.default_scene = scenes.Scene(
             objects = [self.s1, self.s2],
             lights = [self.l1]
-
         )
 
     def test_default_scene(self):
@@ -158,3 +157,37 @@ class TestScenes(unittest.TestCase):
         # Point inside object
         self.assertTrue(self.default_scene.is_shadowed(
             points.Point(-0.5, 0.5, -0.5), self.default_scene.lights[0]))
+
+    def test_shadows__full_scene(self):
+        """Test that we identify a shadow in a full scene"""
+
+        # First sphere is at z=10
+        s1 = shapes.Sphere()
+        s1.set_transform(transforms.Translate(0, 0, 10))
+
+        # Second sphere is at the origin
+        s2 = shapes.Sphere()
+        s2.material = materials.Material()
+
+        # Light is at z=-10
+        l1 = lights.Light(
+            position=points.Point(0, 0, -10),
+            intensity=colors.Color(1, 1, 1)
+            )
+
+        scene = scenes.Scene(
+            objects = [s1, s2],
+            lights = [l1]
+        )
+
+        # The ray is at z=5 (i.e. between the spheres), pointing at the further
+        # out sphere
+        ray = rays.Ray(points.Point(0, 0, 5),
+                       vectors.Vector(0, 0,1))
+
+        isection = intersections.Intersection(s2, 4)
+        comps = isection.precompute(ray)
+
+        result = scene.shade_hit(comps)
+
+        self.assertEqual(result, colors.Color(0.1, 0.1, 0.1))
