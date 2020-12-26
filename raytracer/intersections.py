@@ -1,3 +1,8 @@
+"""Module contains an implementation of intersections.  An intersection
+represents a ray striking a shape.  The intersections object contains all the
+shapes that a ray strikes
+"""
+
 import rays
 import shapes
 
@@ -21,6 +26,10 @@ class Computations:
             self.normalv = - self.normalv
 
 class Intersection:
+    """Class represents a single intersection (instance of a ray hitting an
+    object)
+    """
+
     def __init__(self, shape: shapes.Shape, t: float):
         self.shape = shape
         self.t = t

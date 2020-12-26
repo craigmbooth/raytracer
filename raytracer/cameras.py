@@ -3,6 +3,13 @@ world
 """
 import math
 
+import canvas
+import points
+import rays
+import scenes
+import transforms
+import vectors
+
 class Camera:
     """Camera class.  All scenes have one of these"""
 
@@ -24,3 +31,35 @@ class Camera:
             self.half_height = half_view
 
         self.pixel_size = self.half_width * 2 / self.hsize
+
+        self.transform = transforms.Identity(4)
+
+    def ray_for_pixel(self, px: int, py: int) -> rays.Ray:
+        """Given the x and y indices of a pixel, get the ray that is fired"""
+
+        xoffset = (px + 0.5) * self.pixel_size
+        yoffset = (py + 0.5) * self.pixel_size
+
+        world_x = self.half_width - xoffset
+        world_y = self.half_height - yoffset
+
+        # Using the camera's transform, change the canvas point and origin.
+        # remember the canvas is at z=-1
+        pixel = self.transform.inverse() * points.Point(world_x, world_y, -1)
+        origin = self.transform.inverse() * points.Point(0, 0, 0)
+        direction = (pixel - origin).normalize()
+
+        return rays.Ray(origin, direction)
+
+    def render(self, scene: scenes.Scene):
+        """Renders a scene and returns a filled in canvas"""
+
+        image = canvas.Canvas(self.hsize, self.vsize)
+
+        for y in range(self.vsize):
+            for x in range(self.hsize):
+                ray = self.ray_for_pixel(x, y)
+                color = scene.color_at(ray)
+                image.set(x, y, color)
+
+        return image
