@@ -1,7 +1,10 @@
 """Class defines a camera and provides mappings from camera coordinates to the
 world
 """
+import logging
 import math
+import sys
+import time
 
 import canvas
 import points
@@ -54,12 +57,22 @@ class Camera:
     def render(self, scene: scenes.Scene):
         """Renders a scene and returns a filled in canvas"""
 
+        logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+
+        t0 = time.time()
+        logging.info(f"Starting to render scene with size "
+                     f"{self.hsize}, {self.vsize}")
         image = canvas.Canvas(self.hsize, self.vsize)
 
         for y in range(self.vsize):
+            print(y)
             for x in range(self.hsize):
                 ray = self.ray_for_pixel(x, y)
                 color = scene.color_at(ray)
                 image.set(x, y, color)
+
+        t1 = time.time()
+        logging.info(f"Rendered scene in {round(t1-t0, 2)}s "
+                     f"({round(self.hsize*self.vsize/(t1-t0), 2)} pps)")
 
         return image

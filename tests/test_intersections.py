@@ -4,6 +4,7 @@ import intersections
 import rays
 import points
 import shapes
+import transforms
 import vectors
 
 class TestIntersections(unittest.TestCase):
@@ -104,6 +105,22 @@ class TestIntersections(unittest.TestCase):
         self.assertEqual(computations.normalv, vectors.Vector(0, 0, -1))
         self.assertTrue(computations.inside)
 
+
+    def test_precompute__over_vector(self):
+        """Test that we calculate a vector just outside of the surface of a
+        shape
+        """
+
+        r = rays.Ray(points.Point(0, 0, -5), vectors.Vector(0, 0, 1))
+
+        s = shapes.Sphere()
+        s.set_transform(transforms.Translate(0, 0, 1))
+
+        i = intersections.Intersection(s, 5)
+
+        computations = i.precompute(r)
+        self.assertTrue(computations.over_point.z < computations.point.z)
+        self.assertTrue(computations.over_point.z < -intersections.EPSILON/2)
 
 if __name__ == "__main__":
     unittest.main()

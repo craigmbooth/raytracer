@@ -11,7 +11,7 @@ class Shape:
 
     def __init__(self, material=materials.Material()):
         self.id = uuid.uuid4()
-        self.transform = transforms.Identity(4)
+        self.set_transform(transforms.Identity(4))
         self.material = material
 
     def __eq__(self, other):
@@ -20,6 +20,7 @@ class Shape:
     def set_transform(self, M):
         """Sets the shape's transform to the matrix M"""
         self.transform = M
+        self.inverse_transform = M.inverse()
 
     def intersect(self, ray: rays.Ray):
         raise NotImplementedError
@@ -32,7 +33,7 @@ class Sphere(Shape):
     def intersect(self, ray: rays.Ray):
 
         # Transform the ray by the inverse of the sphere's transform
-        r2 = ray.transform(self.transform.inverse())
+        r2 = ray.transform(self.inverse_transform)
 
         sphere_to_ray = r2.origin - points.Point(0, 0, 0)
 

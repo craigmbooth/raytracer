@@ -6,6 +6,8 @@ shapes that a ray strikes
 import rays
 import shapes
 
+EPSILON = 1e-3
+
 class Computations:
     """Class holds precomputed values for an intersection"""
     def __init__(self, intersection, ray: rays.Ray):
@@ -24,6 +26,10 @@ class Computations:
             # the object.
             self.inside = True
             self.normalv = - self.normalv
+
+        # This is the point jsut a tiny bit above the surface, used to avoid
+        # rounding errors from messing things up
+        self.over_point = self.point + self.normalv * EPSILON
 
 class Intersection:
     """Class represents a single intersection (instance of a ray hitting an

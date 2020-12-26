@@ -130,7 +130,11 @@ class Matrix:
         arguments removed
         """
 
-        M = copy.deepcopy(self)
+        M = Matrix(self.rows, self.columns)
+        for i in range(self.columns):
+            for j in range(self.rows):
+                M.set(i, j, self.values[i][j])
+
         _ = M.values.pop(row)
         for row_values in M.values:
             row_values.pop(column)
@@ -174,7 +178,6 @@ class Matrix:
         determinant = self.det()
         if determinant == 0:
             raise exceptions.CannotInvertMatrixError
-
 
         M = Matrix(self.rows, self.columns)
 

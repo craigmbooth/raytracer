@@ -135,3 +135,26 @@ class TestScenes(unittest.TestCase):
             scene.color_at(r),
             scene.objects[0].material.color
             )
+
+    def test_is_shadowed(self):
+        """Test we find shadows appropriately"""
+
+        # Directly illuminated
+        self.assertFalse(self.default_scene.is_shadowed(
+            points.Point(0, 10, 0), self.default_scene.lights[0]))
+
+        # Behind the sphere
+        self.assertTrue(self.default_scene.is_shadowed(
+            points.Point(10, -10, 10), self.default_scene.lights[0]))
+
+        # Light between point and object
+        self.assertFalse(self.default_scene.is_shadowed(
+            points.Point(-20, 20, -20), self.default_scene.lights[0]))
+
+        # Point between light and object
+        self.assertFalse(self.default_scene.is_shadowed(
+            points.Point(-2, 2, -2), self.default_scene.lights[0]))
+
+        # Point inside object
+        self.assertTrue(self.default_scene.is_shadowed(
+            points.Point(-0.5, 0.5, -0.5), self.default_scene.lights[0]))

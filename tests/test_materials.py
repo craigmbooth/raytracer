@@ -72,9 +72,24 @@ class TestMaterials(unittest.TestCase):
         light = lights.PointLight(
             points.Point(0, 0, 10),
             colors.Color(1, 1, 1))
+
         result = m.lighting(light, p, eyev, normalv)
         self.assertEqual(result, colors.Color(0.1, 0.1, 0.1))
 
+
+    def test_lighting__shadow(self):
+        """Test that we get the ambient color if we're in shadow"""
+
+        m = materials.Material()
+        p = points.Point(0, 0, 0)
+
+        eyev = vectors.Vector(0, 0, -1)
+        normalv = vectors.Vector(0, 0, -1)
+        light = lights.PointLight(
+            points.Point(0, 0, -10),
+            colors.Color(1, 1, 1))
+        result = m.lighting(light, p, eyev, normalv, in_shadow=True)
+        self.assertEqual(result, colors.Color(0.1, 0.1, 0.1))
 
 
 if __name__ == "__main__":

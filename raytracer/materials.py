@@ -27,7 +27,12 @@ class Material:
                  light: lights.Light,
                  point: points.Point,
                  eyev: vectors.Vector,
-                 normalv: vectors.Vector) -> colors.Color:
+                 normalv: vectors.Vector,
+                 in_shadow: bool=False) -> colors.Color:
+        """Calculate Phong lighting model for a material"""
+
+        if in_shadow is True:
+            return self.color * self.ambient
 
         # combine the surface color with the light's color/intensity
         effective_color = self.color * light.intensity
@@ -38,6 +43,7 @@ class Material:
 
         # compute the ambient contribution
         ambient = effective_color * self.ambient
+
 
         # light_dot_normal represents the cosine of the angle between the
         # light vector and the normal vector. A negative number means the
