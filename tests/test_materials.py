@@ -15,6 +15,7 @@ class TestMaterials(unittest.TestCase):
         mat1 = materials.Material()
         self.assertEqual(mat1.ambient, 0.1)
         self.assertEqual(mat1.shininess, 200)
+        self.assertEqual(mat1.reflective, 0)
 
         mat2 = materials.Material(ambient=0.2)
         self.assertEqual(mat2.ambient, 0.2)

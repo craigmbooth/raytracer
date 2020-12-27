@@ -27,9 +27,11 @@ class Computations:
             self.inside = True
             self.normalv = - self.normalv
 
-        # This is the point jsut a tiny bit above the surface, used to avoid
+        # This is the point just a tiny bit above the surface, used to avoid
         # rounding errors from messing things up
         self.over_point = self.point + self.normalv * EPSILON
+
+        self.reflectv = ray.direction.reflect(self.normalv)
 
 class Intersection:
     """Class represents a single intersection (instance of a ray hitting an

@@ -45,16 +45,18 @@ class Scene:
                   computations: intersections.Computations) -> colors.Color:
         """Given some pre-calculated values about a hit, calculate its color"""
 
-        color = colors.Color(0, 0, 0)
+        surface = colors.Color(0, 0, 0)
         for light in self.lights:
 
             in_shadow = self.is_shadowed(computations.over_point, light)
 
-            color += computations.object.material.lighting(light,
+            surface += computations.object.material.lighting(light,
                     computations.over_point, computations.eyev,
                     computations.normalv, in_shadow = in_shadow)
 
-        return color
+            reflected = self.reflected_color(computations)
+
+        return surface + reflected
 
     def color_at(self, ray: rays.Ray) -> colors.Color:
         """Calculates the color of a ray in the scene"""
@@ -88,3 +90,18 @@ class Scene:
             return True
 
         return False
+
+    def reflected_color(self,
+                       precomputes: intersections.Computations) -> colors.Color:
+        """Calculate the reflected color of a hit on a surface"""
+
+        if precomputes.object.material.reflective == 0:
+            # If the material is not reflective, return black
+            return colors.Color(0, 0, 0)
+
+        # Fire a new ray from the intersection point at the reflection angle
+        reflect_ray = rays.Ray(precomputes.over_point, precomputes.reflectv)
+
+        color = self.color_at(reflect_ray)
+
+        return color * precomputes.object.material.reflective

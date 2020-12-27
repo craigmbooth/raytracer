@@ -10,12 +10,13 @@ BLACK = colors.Color(0, 0, 0)
 class Material:
 
     def __init__(self, ambient=0.1, diffuse=0.9, specular=0.9, shininess=200.0,
-                 color=colors.Color(1, 1, 1)):
+                 reflective=0.0, color=colors.Color(1, 1, 1)):
 
         self.ambient = ambient
         self.diffuse = diffuse
         self.specular = specular
         self.shininess = shininess
+        self.reflective = reflective
         self.color = color
 
     def __eq__(self, other) :

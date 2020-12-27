@@ -1,3 +1,4 @@
+import math
 import unittest
 
 import intersections
@@ -121,6 +122,21 @@ class TestIntersections(unittest.TestCase):
         computations = i.precompute(r)
         self.assertTrue(computations.over_point.z < computations.point.z)
         self.assertTrue(computations.over_point.z < -intersections.EPSILON/2)
+
+
+    def test_precompute_reflectv(self):
+        """Test that we can calculate the reflection vector"""
+
+        p = shapes.Plane()
+        r = rays.Ray(points.Point(0, 1, -1),
+                     vectors.Vector(0, -math.sqrt(2)/2, math.sqrt(2)/2))
+        i = intersections.Intersection(p, math.sqrt(2))
+
+        comps = i.precompute(r)
+
+        self.assertEqual(comps.reflectv,
+                         vectors.Vector(0, math.sqrt(2)/2, math.sqrt(2)/2))
+
 
 if __name__ == "__main__":
     unittest.main()

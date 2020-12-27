@@ -196,11 +196,10 @@ class TestPlane(unittest.TestCase):
         xs = p.local_intersect(r)
         self.assertEqual(len(xs.intersections), 0)
 
-
         # Rays that do intersect the plane
         r = rays.Ray(points.Point(0, 1, 0), vectors.Vector(0, -1, 0))
         xs = p.local_intersect(r)
-        self.assertEqual(xs.t, 1)
+        self.assertEqual(xs.intersections[0].t, 1)
 
 if __name__ == "__main__":
     unittest.main()
