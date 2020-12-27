@@ -11,7 +11,6 @@ import points
 import rays
 import scenes
 import transforms
-import vectors
 
 class Camera:
     """Camera class.  All scenes have one of these"""
@@ -68,7 +67,7 @@ class Camera:
             print(y)
             for x in range(self.hsize):
                 ray = self.ray_for_pixel(x, y)
-                color = scene.color_at(ray)
+                color, _ = scene.color_at(ray)
                 image.set(x, y, color)
 
         t1 = time.time()

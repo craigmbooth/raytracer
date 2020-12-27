@@ -1,3 +1,5 @@
+"""Module contains a class that represents the material a shape is made of"""
+
 import math
 
 import colors
@@ -9,8 +11,11 @@ BLACK = colors.Color(0, 0, 0)
 
 class Material:
 
-    def __init__(self, ambient=0.1, diffuse=0.9, specular=0.9, shininess=200.0,
-                 reflective=0.0, color=colors.Color(1, 1, 1)):
+    def __init__(self, ambient: float=0.1, diffuse: float=0.9,
+                 specular: float=0.9, shininess: float=200.0,
+                 reflective: float=0.0, transparency: float=0.0,
+                 refractive_index: float=1.0,
+                 color: colors.Color=colors.Color(1, 1, 1)) -> None:
 
         self.ambient = ambient
         self.diffuse = diffuse
@@ -18,6 +23,8 @@ class Material:
         self.shininess = shininess
         self.reflective = reflective
         self.color = color
+        self.transparency = transparency
+        self.refractive_index = refractive_index
 
     def __eq__(self, other) :
         """Equality check returns true if all attributes match"""
@@ -44,7 +51,6 @@ class Material:
 
         # compute the ambient contribution
         ambient = effective_color * self.ambient
-
 
         # light_dot_normal represents the cosine of the angle between the
         # light vector and the normal vector. A negative number means the

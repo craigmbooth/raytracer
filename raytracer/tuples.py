@@ -1,3 +1,4 @@
+"""Class contains an implementation of a basic tuple object"""
 import math
 
 import exceptions
@@ -73,21 +74,22 @@ class Tuple:
     def _close(x, y, epsilon=1e-3):
         """Utility function, returns True if two numbers are close, else false
         """
-        return True if abs(x-y) < epsilon else False
+        return abs(x-y) < epsilon
 
     def __eq__(self, other):
 
         if len(self.fillables) != len(other.fillables):
             return False
 
-        for f1, f2 in zip(self.fillables, other.fillables):
-            if (not self._close(getattr(self, f1), getattr(other, f2)) or
-                (f1 != f2)):
+        for fill1, fill2 in zip(self.fillables, other.fillables):
+            if (not self._close(getattr(self, fill1), getattr(other, fill2)) or
+                (fill1 != fill2)):
                 return False
-        else:
-            return True
 
-    def values(self):
+        return True
+
+    def values(self) -> list:
+        """Return a raw list of the values in the tuple"""
         return [getattr(self, f) for f in self.fillables]
 
     def magnitude(self):
