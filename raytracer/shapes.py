@@ -1,3 +1,4 @@
+from typing import List
 import math
 import uuid
 
@@ -6,8 +7,14 @@ import materials
 import points
 import rays
 import transforms
+import vectors
+
+# If a ray has a y component smaller than this, it is near-parallel
+# to the plane, so don't intersect
+MIN_Y_FOR_PLANE_INTERSECT = 1e-2
 
 class Shape:
+    """Class for the base shape"""
 
     def __init__(self, material=materials.Material()):
         self.id = uuid.uuid4()
@@ -23,22 +30,82 @@ class Shape:
         self.inverse_transform = M.inverse()
 
     def intersect(self, ray: rays.Ray):
+        """Return the t values for where the ray intersects the shape"""
+
+        # Transform the ray by the inverse of the shape's transform to get into
+        # object coordinates
+        local_ray = ray.transform(self.inverse_transform)
+
+        return self.local_intersect(local_ray)
+
+    def normal_at(self, point: points.Point) -> vectors.Vector:
+        """Returns the normal vector for the shape at the given point"""
+
+        # Transform to object coordinates, and get the nortmal in those
+        # coordinates
+        local_point = self.inverse_transform * point
+        local_normal = self.local_normal_at(local_point)
+
+        world_normal = self.inverse_transform.transpose() * local_normal
+        world_normal.w = 0
+
+        return world_normal.normalize()
+
+    def local_normal_at(self, local_point: points.Point):
+        """This takes a point in object coordinates and returns the direction
+        of the normal in local coordinates
+        """
         raise NotImplementedError
 
-    def normal_at(self, point: points.Point):
+    def local_intersect(self, ray: rays.Ray):
+        """This takes a ray and returns the t values at which the ray intersects
+        the shape, if any
+        """
         raise NotImplementedError
+
+class Plane(Shape):
+    """Class represents an infinite plane.
+
+    In object units, the plane is in the x-z plane and is at y=0"""
+
+    def local_intersect(self, local_ray: rays.Ray):
+        """Return the t-value where the ray intersects with the plane, in local
+        units
+        """
+
+        # If the y-direction of the ray is small it is approximately parallel to
+        #the plane, no intersections
+        if abs(local_ray.direction.y) < MIN_Y_FOR_PLANE_INTERSECT:
+            return intersections.Intersections()
+
+        t = -local_ray.origin.y / local_ray.direction.y
+        return intersections.Intersections(
+            intersections.Intersection(self, t))
+
+
+    def local_normal_at(self, object_point: points.Point) -> vectors.Vector:
+        """Returns the normal vector in object coordinates.  For a sphere
+        the normal direction is always just the vector from the origin to the
+        point
+        """
+        return vectors.Vector(0, 1, 0)
+
 
 class Sphere(Shape):
+    """Class represents a sphere shape
 
-    def intersect(self, ray: rays.Ray):
+    In object units this is a unit sphere centered on the origin
+    """
 
-        # Transform the ray by the inverse of the sphere's transform
-        r2 = ray.transform(self.inverse_transform)
+    def local_intersect(self, local_ray: rays.Ray):
+        """Return to t values for where the ray intersects the shape.  All in
+        local coordinates for the shape
+        """
 
-        sphere_to_ray = r2.origin - points.Point(0, 0, 0)
+        sphere_to_ray = local_ray.origin - points.Point(0, 0, 0)
 
-        a = r2.direction.dot(r2.direction)
-        b = 2 * r2.direction.dot(sphere_to_ray)
+        a = local_ray.direction.dot(local_ray.direction)
+        b = 2 * local_ray.direction.dot(sphere_to_ray)
         c = sphere_to_ray.dot(sphere_to_ray) - 1
         discriminant = b**2 - 4 * a * c
 
@@ -51,13 +118,9 @@ class Sphere(Shape):
                 intersections.Intersection(self, t1),
                 intersections.Intersection(self, t2))
 
-
-    def normal_at(self, point: points.Point):
-
-        object_point = self.transform.inverse() * point
-        object_normal = object_point - points.Point(0, 0, 0)
-
-        world_normal = self.transform.inverse().transpose() * object_normal
-        world_normal.w = 0
-
-        return world_normal.normalize()
+    def local_normal_at(self, object_point: points.Point) -> vectors.Vector:
+        """Returns the normal vector in object coordinates.  For a sphere
+        the normal direction is always just the vector from the origin to the
+        point
+        """
+        return object_point - points.Point(0, 0, 0)

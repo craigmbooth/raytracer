@@ -165,5 +165,42 @@ class TestSphere(unittest.TestCase):
         self.assertEqual(s.material,
                          materials.Material(shininess=100))
 
+class TestPlane(unittest.TestCase):
+    """Tests on the plane shape"""
+
+    def test_local_normal_at(self):
+        """Test that the local normal is always in the y direction"""
+
+        p = shapes.Plane()
+
+        self.assertEqual(p.local_normal_at(points.Point(0, 0, 0)),
+                         vectors.Vector(0, 1, 0))
+
+        self.assertEqual(p.local_normal_at(points.Point(10, 0, -10)),
+                         vectors.Vector(0, 1, 0))
+
+        self.assertEqual(p.local_normal_at(points.Point(-5, 0, 150)),
+                         vectors.Vector(0, 1, 0))
+
+    def test_local_intersect(self):
+        """Test we can calculate where a ray intersects with a plane"""
+
+        p = shapes.Plane()
+
+        # Rays parallel with the plane
+        r = rays.Ray(points.Point(0, 10, 0), vectors.Vector(0, 0, 1))
+        xs = p.local_intersect(r)
+        self.assertEqual(len(xs.intersections), 0)
+
+        r = rays.Ray(points.Point(0, 0, 0), vectors.Vector(0, 0, 1))
+        xs = p.local_intersect(r)
+        self.assertEqual(len(xs.intersections), 0)
+
+
+        # Rays that do intersect the plane
+        r = rays.Ray(points.Point(0, 1, 0), vectors.Vector(0, -1, 0))
+        xs = p.local_intersect(r)
+        self.assertEqual(xs.t, 1)
+
 if __name__ == "__main__":
     unittest.main()

@@ -1,5 +1,4 @@
 """Module contains all objects that represent basic matrix types"""
-import copy
 from typing import Union, List
 
 import exceptions

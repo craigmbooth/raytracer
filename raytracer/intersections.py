@@ -36,7 +36,7 @@ class Intersection:
     object)
     """
 
-    def __init__(self, shape: shapes.Shape, t: float):
+    def __init__(self, shape: shapes.Shape, t: float) -> None:
         self.shape = shape
         self.t = t
 
@@ -45,7 +45,6 @@ class Intersection:
 
     def __repr__(self):
         return f"Intersection at t={self.t} with {self.shape}"
-
 
     def precompute(self, r: rays.Ray) -> Computations:
         return Computations(self, r)
