@@ -1,4 +1,5 @@
 """The scene is the collection of objects, camera and lights to be rendered"""
+import math
 from typing import List, Tuple
 
 import colors
@@ -58,25 +59,28 @@ class Scene:
                     computations.over_point, computations.eyev,
                     computations.normalv, in_shadow = in_shadow)
 
-            reflected, remaining = self.reflected_color(computations, remaining=remaining)
+            reflected, remaining = self.reflected_color(computations,
+                                                        remaining=remaining)
+            refracted, remaining = self.refracted_color(computations,
+                                                        remaining=remaining)
 
-        return surface + reflected, remaining
+        return surface + reflected + refracted, remaining
 
     def color_at(self, ray: rays.Ray, remaining=5) -> Tuple[colors.Color, int]:
         """Calculates the color of a ray in the scene"""
 
         # List out all the surfaces the ray intersects
-        intersections = self.intersect(ray)
+        ray_intersections = self.intersect(ray)
 
         # Find the closest one, in front of the camera (the "hit"):
-        hit = intersections.hit()
+        hit = ray_intersections.hit()
 
         # If there were no hits, return the background color
         if hit is None:
-            return colors.Color(0, 0, 0), 0
+            return colors.Color(0, 0, 0), remaining
 
         # Else, calculate the color of the pixel
-        precomputes = hit.precompute(ray)
+        precomputes = hit.precompute(ray, all_intersections=ray_intersections)
         return self.shade_hit(precomputes, remaining)
 
     def is_shadowed(self, point: points.Point, light: lights.Light) -> bool:
@@ -121,3 +125,39 @@ class Scene:
         color, remaining = self.color_at(reflect_ray, remaining=remaining)
 
         return color * precomputes.object.material.reflective, remaining
+
+
+    def refracted_color(self,
+                        precomputes: intersections.Computations,
+                        remaining: int=5) -> Tuple[colors.Color, int]:
+        """Calculate the refracted color of a hit on a surface.
+
+        remaining tracks how many levels of recursion we have done, and when
+        it is zero, simply returns black
+        """
+
+        #if remaining == 0:
+        #    # If we have gone too far down the recursion stack, just return
+        #    # black
+        #    return colors.Color(0, 0, 0), remaining
+
+        if precomputes.object.material.transparency == 0:
+            # If the material is not transparent, return black
+            return colors.Color(0, 0, 0), remaining
+
+        # Check for total internal refraction
+        n_ratio = precomputes.n1 / precomputes.n2
+        cos_i = precomputes.eyev.dot(precomputes.normalv)
+        sin2_t = n_ratio ** 2 * (1 - cos_i ** 2)
+        if sin2_t > 1:
+            return colors.Color(0, 0, 0), remaining
+
+        cos_t = math.sqrt(1.0 - sin2_t)
+
+        direction = precomputes.normalv * (n_ratio * cos_i - cos_t) - precomputes.eyev * n_ratio
+
+        refract_ray = rays.Ray(precomputes.under_point, direction)
+
+        color = self.color_at(refract_ray, remaining-1)[0] * precomputes.object.material.transparency
+
+        return color, remaining

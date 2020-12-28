@@ -36,11 +36,11 @@ class Camera:
 
         self.transform = transforms.Identity(4)
 
-    def ray_for_pixel(self, px: int, py: int) -> rays.Ray:
+    def ray_for_pixel(self, pixel_x: int, pixel_y: int) -> rays.Ray:
         """Given the x and y indices of a pixel, get the ray that is fired"""
 
-        xoffset = (px + 0.5) * self.pixel_size
-        yoffset = (py + 0.5) * self.pixel_size
+        xoffset = (pixel_x + 0.5) * self.pixel_size
+        yoffset = (pixel_y + 0.5) * self.pixel_size
 
         world_x = self.half_width - xoffset
         world_y = self.half_height - yoffset
@@ -58,20 +58,19 @@ class Camera:
 
         logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
-        t0 = time.time()
+        time_0 = time.time()
         logging.info(f"Starting to render scene with size "
                      f"{self.hsize}, {self.vsize}")
         image = canvas.Canvas(self.hsize, self.vsize)
 
         for y in range(self.vsize):
-            print(y)
             for x in range(self.hsize):
                 ray = self.ray_for_pixel(x, y)
                 color, _ = scene.color_at(ray)
                 image.set(x, y, color)
 
-        t1 = time.time()
-        logging.info(f"Rendered scene in {round(t1-t0, 2)}s "
-                     f"({round(self.hsize*self.vsize/(t1-t0), 2)} pps)")
+        time_1 = time.time()
+        logging.info(f"Rendered scene in {round(time_1-time_0, 2)}s "
+                     f"({round(self.hsize*self.vsize/(time_1-time_0), 2)} pps)")
 
         return image

@@ -1,4 +1,5 @@
 import copy
+import math
 import unittest
 
 import colors
@@ -72,7 +73,7 @@ class TestScenes(unittest.TestCase):
         i = intersections.Intersection(shape, 4)
         computations = i.precompute(r)
 
-        color = self.default_scene.shade_hit(computations)
+        color, _ = self.default_scene.shade_hit(computations)
         self.assertEqual(color, colors.Color(0.38066, 0.47583, 0.2855))
 
 
@@ -94,7 +95,7 @@ class TestScenes(unittest.TestCase):
         i = intersections.Intersection(shape, 0.5)
         computations = i.precompute(r)
 
-        color = self.default_scene.shade_hit(computations)
+        color, _ = self.default_scene.shade_hit(computations)
 
         self.assertEqual(color, colors.Color(0.90498, 0.90498, 0.90498))
 
@@ -107,7 +108,7 @@ class TestScenes(unittest.TestCase):
             vectors.Vector(0, 1, 0)
             )
         self.assertEqual(
-            self.default_scene.color_at(r),
+            self.default_scene.color_at(r)[0],
             colors.Color(0, 0, 0)
             )
 
@@ -117,7 +118,7 @@ class TestScenes(unittest.TestCase):
             vectors.Vector(0, 0, 1)
             )
         self.assertEqual(
-            self.default_scene.color_at(r),
+            self.default_scene.color_at(r)[0],
             colors.Color(0.38066, 0.47583, 0.2855)
             )
 
@@ -131,7 +132,7 @@ class TestScenes(unittest.TestCase):
             vectors.Vector(0, 0, -1)
             )
         self.assertEqual(
-            scene.color_at(r),
+            scene.color_at(r)[0],
             scene.objects[0].material.color
             )
 
@@ -188,6 +189,110 @@ class TestScenes(unittest.TestCase):
         isection = intersections.Intersection(s2, 4)
         comps = isection.precompute(ray)
 
-        result = scene.shade_hit(comps)
+        result, _ = scene.shade_hit(comps)
 
         self.assertEqual(result, colors.Color(0.1, 0.1, 0.1))
+
+
+    def test_reflection__reflective(self):
+        """Test the reflection color of a reflective material is not black"""
+
+        p = shapes.Plane(
+            material=materials.Material(reflective=0.5)
+            )
+        p.set_transform(transforms.Translate(0, -1, 0))
+
+        world = copy.deepcopy(self.default_scene)
+
+        world.objects.append(p)
+
+        r = rays.Ray(points.Point(0, 0, -3),
+                     vectors.Vector(0, -math.sqrt(2)/2, math.sqrt(2)/2))
+
+        i = intersections.Intersection(p, math.sqrt(2))
+
+        comps = i.precompute(r)
+
+        # Test reflected color alone
+        result, _ = world.reflected_color(comps)
+        self.assertEqual(result, colors.Color(0.19032, 0.2379, 0.14274))
+
+        # Now test the reflected color is added to the surface color
+        result, _ = world.shade_hit(comps)
+        self.assertEqual(result, colors.Color(0.87677, 0.92436, 0.82918))
+
+
+    def test_reflection__non_reflective(self):
+        """Test the reflection color of a nonreflective material is not black"""
+
+        world = copy.deepcopy(self.default_scene)
+
+        s = world.objects[0]
+        s.material.ambient = 1
+
+        # The ray is inside the inner sphere of the default scene
+        r = rays.Ray(points.Point(0, 0, 0),
+                     vectors.Vector(0, 0, 1))
+
+        i = intersections.Intersection(s, 1)
+
+        comps = i.precompute(r)
+
+        result, _ = world.reflected_color(comps)
+
+        self.assertEqual(result, colors.Color(0, 0, 0))
+
+
+    def test_reflection__infinite_recursion(self):
+        """Test that we don't break if there is infinite recursion"""
+
+        # Two parallel planes
+        s1 = shapes.Plane(material=materials.Material(reflective=1))
+        s1.set_transform(transforms.Translate(0, -1, 0))
+
+
+        # Second sphere is at the origin
+        s2 = shapes.Plane(material=materials.Material(reflective=1))
+        s2.set_transform(transforms.Translate(0, 1, 0))
+
+
+        # Light is at z=-10
+        l1 = lights.Light(
+            position=points.Point(0, 0, 0),
+            intensity=colors.Color(1, 1, 1)
+            )
+
+        scene = scenes.Scene(
+            objects = [s1, s2],
+            lights = [l1]
+        )
+
+        r = rays.Ray(points.Point(0, 0, 0), vectors.Vector(0, 1, 0))
+
+        # If this is working the following will NOT cause a stack trace
+        scene.color_at(r)
+
+
+    def test_refraction__opaque(self):
+        """Test the refraction color of an opaque material is black"""
+
+        world = copy.deepcopy(self.default_scene)
+
+        s = world.objects[1]
+
+        # The ray is inside the inner sphere of the default scene
+        r = rays.Ray(points.Point(0, 0, -5),
+                     vectors.Vector(0, 0, 1))
+
+        xs = intersections.Intersections(
+            intersections.Intersection(s, 4),
+            intersections.Intersection(s, 6))
+
+        comps = xs.intersections[0].precompute(r, all_intersections=xs)
+
+        result, _ = world.refracted_color(comps)
+
+        self.assertEqual(result, colors.Color(0, 0, 0))
+
+if __name__ == "__main__":
+    unittest.main()

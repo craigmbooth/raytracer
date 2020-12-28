@@ -89,4 +89,5 @@ class TestCamera(unittest.TestCase):
         cam.transform = transforms.ViewTransform(from_point, to_point, up)
 
         image = cam.render(scene)
-        self.assertEqual(image.get(5, 5), colors.Color(0.3807, 0.4758, 0.2855))
+        self.assertEqual(image.get(5, 5),
+                         colors.Color(0.3807, 0.4758, 0.2855))

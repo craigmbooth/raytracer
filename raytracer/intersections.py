@@ -2,7 +2,9 @@
 represents a ray striking a shape.  The intersections object contains all the
 shapes that a ray strikes
 """
+from typing import List
 
+import intersections
 import rays
 import shapes
 
@@ -10,7 +12,8 @@ EPSILON = 1e-3
 
 class Computations:
     """Class holds precomputed values for an intersection"""
-    def __init__(self, intersection, ray: rays.Ray):
+    def __init__(self, intersection, ray: rays.Ray,
+                 all_intersections=None):
 
         self.t = intersection.t
         self.object = intersection.shape
@@ -28,11 +31,38 @@ class Computations:
             self.normalv = - self.normalv
 
         # This is the point just a tiny bit above the surface, used to avoid
-        # rounding errors from messing things up
+        # rounding errors
         self.over_point = self.point + self.normalv * EPSILON
+
+        # And this one is a tiny bit under the surface to avoid rounding errors
+        self.under_point = self.point - self.normalv * EPSILON
 
         self.reflectv = ray.direction.reflect(self.normalv)
 
+        self.n1 = self.n2 = 1.0
+
+        if all_intersections is not None:
+
+            containers: List[shapes.Shape] = []
+
+            for isection in all_intersections.intersections:
+                if isection == intersection:
+                    if len(containers) == 0:
+                        self.n1 = 1.0
+                    else:
+                        self.n1 = containers[-1].material.refractive_index
+
+                if isection.shape in containers:
+                    containers.remove(isection.shape)
+                else:
+                    containers.append(isection.shape)
+
+                if isection == intersection:
+                    if len(containers) == 0:
+                        self.n2 = 1.0
+                    else:
+                        self.n2 = containers[-1].material.refractive_index
+                    break
 class Intersection:
     """Class represents a single intersection (instance of a ray hitting an
     object)
@@ -48,8 +78,8 @@ class Intersection:
     def __repr__(self):
         return f"Intersection at t={self.t} with {self.shape}"
 
-    def precompute(self, r: rays.Ray) -> Computations:
-        return Computations(self, r)
+    def precompute(self, r: rays.Ray, all_intersections=None) -> Computations:
+        return Computations(self, r, all_intersections)
 
 
 class Intersections:
