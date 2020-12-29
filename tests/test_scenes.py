@@ -6,6 +6,7 @@ import colors
 import intersections
 import lights
 import materials
+import patterns
 import points
 import rays
 import scenes
@@ -280,7 +281,6 @@ class TestScenes(unittest.TestCase):
 
         s = world.objects[1]
 
-        # The ray is inside the inner sphere of the default scene
         r = rays.Ray(points.Point(0, 0, -5),
                      vectors.Vector(0, 0, 1))
 
@@ -290,9 +290,166 @@ class TestScenes(unittest.TestCase):
 
         comps = xs.intersections[0].precompute(r, all_intersections=xs)
 
-        result, _ = world.refracted_color(comps)
+        result, _ = world.refracted_color(comps, 5)
 
         self.assertEqual(result, colors.Color(0, 0, 0))
+
+    def test_refraction__recursion_limit(self):
+        """Test that we return black if we hit the refraction limit"""
+
+        world = copy.deepcopy(self.default_scene)
+
+        s = world.objects[1]
+
+        s.material.transparency = 1.0
+        s.material.refractive_index = 1.5
+
+        r = rays.Ray(points.Point(0, 0, -5),
+                     vectors.Vector(0, 0, 1))
+
+        xs = intersections.Intersections(
+            intersections.Intersection(s, 4),
+            intersections.Intersection(s, 6))
+
+        comps = xs.intersections[0].precompute(r, all_intersections=xs)
+
+        result, _ = world.refracted_color(comps, 0)
+
+        self.assertEqual(result, colors.Color(0, 0, 0))
+
+
+    def test_refraction__total_internal_reflection(self):
+        """Test that we return black if we hit total internal reflection"""
+
+        world = copy.deepcopy(self.default_scene)
+
+        s = world.objects[1]
+
+        s.material.transparency = 1.0
+        s.material.refractive_index = 1.5
+
+        r = rays.Ray(points.Point(0, 0, math.sqrt(2)/2),
+                     vectors.Vector(0, 1, 0))
+
+        xs = intersections.Intersections(
+            intersections.Intersection(s, -math.sqrt(2)/2),
+            intersections.Intersection(s, math.sqrt(2)/2))
+
+        # n.b. the camera is inside the inner-sphere so use the second
+        # intersection
+        comps = xs.intersections[1].precompute(r, all_intersections=xs)
+
+        result, _ = world.refracted_color(comps, 5)
+
+        self.assertEqual(result, colors.Color(0, 0, 0))
+
+
+    def test_refraction__standard(self):
+        """Test that we return the correct color under normal refraction"""
+
+        world = copy.deepcopy(self.default_scene)
+
+        # s1 = A
+        s1 = world.objects[1]
+        s1.material.ambient = 1.0
+        s1.material.pattern = patterns.TestPattern()
+
+        # s2 = B
+        s2 = world.objects[0]
+        s2.material.transparency = 1.0
+        s2.material.refractive_index = 1.5
+
+
+        r = rays.Ray(points.Point(0, 0, 0.1),
+                     vectors.Vector(0, 1, 0))
+
+        xs = intersections.Intersections(
+            intersections.Intersection(s1, -0.9899),
+            intersections.Intersection(s2, -0.4899),
+            intersections.Intersection(s2, 0.4899),
+            intersections.Intersection(s1, 0.9899))
+
+        # Intersections[2] because the first two are behind the camera
+        comps = xs.intersections[2].precompute(r, all_intersections=xs)
+
+        result, _ = world.refracted_color(comps, 5)
+
+        # Remember the test pattern returns the x, y, z coordinates of the
+        # input point as the color so we can inspect positions
+        self.assertEqual(result, colors.Color(0, 0.99888, 0.0475))
+
+
+    def test_refraction__shading(self):
+        """Test we can shade a pixel with a semi-transparent object"""
+
+        world = copy.deepcopy(self.default_scene)
+
+        floor = shapes.Plane(
+            material=materials.Material(
+                transparency=0.5,
+                refractive_index=1.5))
+        floor.set_transform(transforms.Translate(0, -1, 0))
+
+        ball = shapes.Sphere(
+            material=materials.Material(
+                color=colors.Color(1, 0, 0),
+                ambient=0.5
+                )
+            )
+        ball.set_transform(transforms.Translate(0, -3.5, -0.5))
+
+        r = rays.Ray(points.Point(0, 0, -3),
+                     vectors.Vector(0, -math.sqrt(2)/2, math.sqrt(2)/2))
+        xs = intersections.Intersections(
+            intersections.Intersection(floor, math.sqrt(2))
+            )
+
+        world.add_object(floor)
+        world.add_object(ball)
+
+        comps = xs.intersections[0].precompute(r, all_intersections=xs)
+
+        color, _ = world.shade_hit(comps, remaining=5)
+
+        self.assertEqual(color,
+                         colors.Color(0.93642, 0.68642, 0.68642))
+
+    def test_reflective_transparent_material(self):
+        """Test shade_hit with a reflective, transparent material"""
+
+        world = copy.deepcopy(self.default_scene)
+
+        floor = shapes.Plane(
+            material=materials.Material(
+                reflective=0.5,
+                transparency=0.5,
+                refractive_index=1.5))
+        floor.set_transform(transforms.Translate(0, -1, 0))
+
+        ball = shapes.Sphere(
+            material=materials.Material(
+                color=colors.Color(1, 0, 0),
+                ambient=0.5
+                )
+            )
+        ball.set_transform(transforms.Translate(0, -3.5, -0.5))
+
+        r = rays.Ray(points.Point(0, 0, -3),
+                     vectors.Vector(0, -math.sqrt(2)/2, math.sqrt(2)/2))
+        xs = intersections.Intersections(
+            intersections.Intersection(floor, math.sqrt(2))
+            )
+
+        world.add_object(floor)
+        world.add_object(ball)
+
+        comps = xs.intersections[0].precompute(r, all_intersections=xs)
+
+        color, _ = world.shade_hit(comps, remaining=5)
+
+        self.assertEqual(color,
+                         colors.Color(0.93391, 0.69643, 0.69243))
+
 
 if __name__ == "__main__":
     unittest.main()

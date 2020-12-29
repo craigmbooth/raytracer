@@ -155,6 +155,7 @@ class TestSphere(unittest.TestCase):
 
     def test_default_material(self):
         """Test that a shape has the default material"""
+
         s = shapes.Sphere()
         self.assertEqual(s.material, materials.Material())
 

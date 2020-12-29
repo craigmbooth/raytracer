@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 import math
 import uuid
 
@@ -16,13 +16,24 @@ MIN_Y_FOR_PLANE_INTERSECT = 1e-2
 class Shape:
     """Class for the base shape"""
 
-    def __init__(self, material=materials.Material()):
+    def __init__(self, material: Union[materials.Material, None]=None):
+
         self.id = uuid.uuid4()
+
         self.set_transform(transforms.Identity(4))
-        self.material = material
+
+        if material is None:
+            self.set_material(materials.Material())
+        else:
+            self.set_material(material)
 
     def __eq__(self, other):
         return self.id == other.id
+
+    def set_material(self, material):
+        """Sets the shape's material to material"""
+        material.shape = self
+        self.material = material
 
     def set_transform(self, M):
         """Sets the shape's transform to the matrix M"""

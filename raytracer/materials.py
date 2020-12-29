@@ -1,9 +1,10 @@
 """Module contains a class that represents the material a shape is made of"""
-
+from typing import Union
 import math
 
 import colors
 import lights
+import patterns
 import points
 import vectors
 
@@ -11,24 +12,31 @@ BLACK = colors.Color(0, 0, 0)
 
 class Material:
 
-    def __init__(self, ambient: float=0.1, diffuse: float=0.9,
+    def __init__(self, shape=None,
+                 ambient: float=0.1, diffuse: float=0.9,
                  specular: float=0.9, shininess: float=200.0,
                  reflective: float=0.0, transparency: float=0.0,
                  refractive_index: float=1.0,
+                 pattern: Union[patterns.Pattern, None]=None,
                  color: colors.Color=colors.Color(1, 1, 1)) -> None:
 
+        self.shape = shape
         self.ambient = ambient
         self.diffuse = diffuse
         self.specular = specular
         self.shininess = shininess
         self.reflective = reflective
         self.color = color
+        self.pattern = pattern
         self.transparency = transparency
         self.refractive_index = refractive_index
 
     def __eq__(self, other) :
         """Equality check returns true if all attributes match"""
-        return self.__dict__ == other.__dict__
+
+        dct_1 = {k: v for k, v in self.__dict__.items() if k != "shape"}
+        dct_2 = {k: v for k, v in other.__dict__.items() if k != "shape"}
+        return dct_1 == dct_2
 
 
     def lighting(self,
@@ -39,11 +47,16 @@ class Material:
                  in_shadow: bool=False) -> colors.Color:
         """Calculate Phong lighting model for a material"""
 
+        if self.pattern is not None:
+            color = self.pattern.pattern_at_shape(self.shape, point)
+        else:
+            color = self.color
+
         if in_shadow is True:
-            return self.color * self.ambient
+            return color * self.ambient
 
         # combine the surface color with the light's color/intensity
-        effective_color = self.color * light.intensity
+        effective_color = color * light.intensity
 
         # find the direction to the light source
         light_to_point = light.position - point

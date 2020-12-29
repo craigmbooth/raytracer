@@ -207,5 +207,56 @@ class TestIntersections(unittest.TestCase):
             self.assertDictEqual(expected, {"n1": comps.n1, "n2": comps.n2})
 
 
+    def test_schlick__total_internal_reflection(self):
+        """Test that we calculate the reflectance under total internal
+        reflection
+        """
+
+        r = rays.Ray(points.Point(0, 0, math.sqrt(2)/2),
+                     vectors.Vector(0, 1, 0))
+
+        xs = intersections.Intersections(
+            intersections.Intersection(self.glass_sphere, -math.sqrt(2)/2),
+            intersections.Intersection(self.glass_sphere, math.sqrt(2)/2)
+            )
+
+        comps = xs.intersections[1].precompute(r, all_intersections=xs)
+
+        self.assertEqual(comps.schlick, 1)
+
+
+    def test_schlick__perpendicular(self):
+        """Test that we calculate the reflectance for a perpendicular ray
+        """
+
+        r = rays.Ray(points.Point(0, 0, 0),
+                     vectors.Vector(0, 1, 0))
+
+        xs = intersections.Intersections(
+            intersections.Intersection(self.glass_sphere, -1),
+            intersections.Intersection(self.glass_sphere, 1)
+            )
+
+        comps = xs.intersections[1].precompute(r, all_intersections=xs)
+
+        self.assertAlmostEqual(comps.schlick, 0.04)
+
+
+    def test_schlick__small_angle(self):
+        """Test that we calculate the reflectance at a small angle
+        """
+
+        r = rays.Ray(points.Point(0, 0.99, -2),
+                     vectors.Vector(0, 0, 1))
+
+        xs = intersections.Intersections(
+            intersections.Intersection(self.glass_sphere, 1.8589),
+            )
+
+        comps = xs.intersections[0].precompute(r, all_intersections=xs)
+
+        self.assertAlmostEqual(comps.schlick, 0.48873081)
+
+
 if __name__ == "__main__":
     unittest.main()

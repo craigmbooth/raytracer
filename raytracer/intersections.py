@@ -2,13 +2,13 @@
 represents a ray striking a shape.  The intersections object contains all the
 shapes that a ray strikes
 """
-from typing import List
+import math
+from typing import List, Any
 
 import intersections
 import rays
-import shapes
 
-EPSILON = 1e-3
+EPSILON = 1e-6
 
 class Computations:
     """Class holds precomputed values for an intersection"""
@@ -39,11 +39,12 @@ class Computations:
 
         self.reflectv = ray.direction.reflect(self.normalv)
 
-        self.n1 = self.n2 = 1.0
+        self.n1 = 1.0
+        self.n2 = 1.0
 
         if all_intersections is not None:
 
-            containers: List[shapes.Shape] = []
+            containers: List[Any] = []
 
             for isection in all_intersections.intersections:
                 if isection == intersection:
@@ -63,12 +64,39 @@ class Computations:
                     else:
                         self.n2 = containers[-1].material.refractive_index
                     break
+
+        self.schlick = self.compute_schlick()
+    def compute_schlick(self):
+        """ Calculate the Schlick approximation for the reflectance
+
+        https://en.wikipedia.org/wiki/Schlick%27s_approximation
+        """
+
+        # Cosine of the angle between the eye and normal vectors
+        cos = self.eyev.dot(self.normalv)
+
+        # Total internal reflection happens only if n1 > n2
+        if self.n1 > self.n2:
+
+            n = self.n1 / self.n2
+            sin2_t = n ** 2 * (1.0 - cos ** 2)
+
+            if sin2_t > 1:
+                return 1
+
+            cos_t = math.sqrt(1.0 - sin2_t)
+            cos = cos_t
+
+        r0 = ((self.n1 - self.n2) / (self.n1 + self.n2)) ** 2
+        return r0 + (1-r0) * (1 - cos) ** 5
+
+
 class Intersection:
     """Class represents a single intersection (instance of a ray hitting an
     object)
     """
 
-    def __init__(self, shape: shapes.Shape, t: float) -> None:
+    def __init__(self, shape, t: float) -> None:
         self.shape = shape
         self.t = t
 

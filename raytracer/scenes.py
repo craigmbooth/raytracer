@@ -30,6 +30,12 @@ class Scene:
 
         self.recursion_limit = recursion_limit
 
+
+    def add_object(self, shape: shapes.Shape):
+        """Add an object to the scene"""
+        self.objects.append(shape)
+
+
     def intersect(self, r: rays.Ray) -> intersections.Intersections:
         """Intersect the ray r with all the objects in the scene and return
         intersections sotred by t value
@@ -59,14 +65,21 @@ class Scene:
                     computations.over_point, computations.eyev,
                     computations.normalv, in_shadow = in_shadow)
 
-            reflected, remaining = self.reflected_color(computations,
+            reflected, _ = self.reflected_color(computations,
                                                         remaining=remaining)
-            refracted, remaining = self.refracted_color(computations,
+            refracted, _ = self.refracted_color(computations,
                                                         remaining=remaining)
+
+        material = computations.object.material
+        if material.reflective > 0 and material.transparency > 0:
+            reflectance = computations.schlick
+            return (surface +
+                    reflected * reflectance +
+                    refracted * (1 - reflectance), remaining)
 
         return surface + reflected + refracted, remaining
 
-    def color_at(self, ray: rays.Ray, remaining=5) -> Tuple[colors.Color, int]:
+    def color_at(self, ray: rays.Ray, remaining=25) -> Tuple[colors.Color, int]:
         """Calculates the color of a ray in the scene"""
 
         # List out all the surfaces the ray intersects
@@ -81,7 +94,7 @@ class Scene:
 
         # Else, calculate the color of the pixel
         precomputes = hit.precompute(ray, all_intersections=ray_intersections)
-        return self.shade_hit(precomputes, remaining)
+        return self.shade_hit(precomputes, remaining=remaining)
 
     def is_shadowed(self, point: points.Point, light: lights.Light) -> bool:
         """Returns True if the point is shadowed from the light"""
@@ -94,6 +107,7 @@ class Scene:
         intersections = self.intersect(ray)
 
         hit = intersections.hit()
+
         if hit is not None and hit.t < distance:
             return True
 
@@ -107,7 +121,6 @@ class Scene:
         remaining tracks how many levels of recursion we have done, and when
         it is zero, simply returns black
         """
-
         if remaining == 0:
             # If we have gone too far down the recursion stack, just return
             # black
@@ -123,8 +136,7 @@ class Scene:
         remaining -= 1
 
         color, remaining = self.color_at(reflect_ray, remaining=remaining)
-
-        return color * precomputes.object.material.reflective, remaining
+        return  color * precomputes.object.material.reflective, remaining
 
 
     def refracted_color(self,
@@ -136,10 +148,10 @@ class Scene:
         it is zero, simply returns black
         """
 
-        #if remaining == 0:
-        #    # If we have gone too far down the recursion stack, just return
-        #    # black
-        #    return colors.Color(0, 0, 0), remaining
+        if remaining == 0:
+            # If we have gone too far down the recursion stack, just return
+            # black
+            return colors.Color(0, 0, 0), remaining
 
         if precomputes.object.material.transparency == 0:
             # If the material is not transparent, return black
@@ -154,10 +166,12 @@ class Scene:
 
         cos_t = math.sqrt(1.0 - sin2_t)
 
-        direction = precomputes.normalv * (n_ratio * cos_i - cos_t) - precomputes.eyev * n_ratio
+        direction = (precomputes.normalv * (n_ratio * cos_i - cos_t) -
+                         precomputes.eyev * n_ratio)
 
         refract_ray = rays.Ray(precomputes.under_point, direction)
 
-        color = self.color_at(refract_ray, remaining-1)[0] * precomputes.object.material.transparency
+        color = (self.color_at(refract_ray, remaining-1)[0] *
+                     precomputes.object.material.transparency)
 
         return color, remaining

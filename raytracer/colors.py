@@ -25,7 +25,7 @@ class Color(tuples.Tuple):
 
     def __mul__(self, other):
 
-        if isinstance(other, numbers.Number):
+        if isinstance(other, float) or isinstance(other, int):
             # If the other item is a number, use the parent scalar
             # multiplication
             return super().__mul__(other)

@@ -64,6 +64,7 @@ class Camera:
         image = canvas.Canvas(self.hsize, self.vsize)
 
         for y in range(self.vsize):
+            print(y)
             for x in range(self.hsize):
                 ray = self.ray_for_pixel(x, y)
                 color, _ = scene.color_at(ray)
